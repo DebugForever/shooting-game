@@ -24,9 +24,12 @@ class Game:
     bullets_p: Group
     bullets_e: Group
     clock: pygame.time.Clock
+    joystick: pygame.joystick.Joystick
 
     def __init__(self):
         pygame.init()
+        pygame.joystick.init()
+        pygame.event.set_allowed(setting.event_allowed)
         self.setup()
         self.done = False
 
@@ -34,7 +37,12 @@ class Game:
         self.screen = pygame.display.set_mode(setting.screen_resolution)
         self.screen_rect = self.screen.get_rect()
         pygame.display.set_caption(setting.caption)
+
         self.clock = pygame.time.Clock()
+
+        self.joystick = pygame.joystick.Joystick(0)
+        self.joystick.init()
+
         self.setup_entities()
 
     def setup_entities(self):
@@ -62,32 +70,11 @@ class Game:
         pygame.quit()
 
     def handle_events(self):
-        # todo 添加手柄支持
-        keymap = setting.keymap
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
-                if event.key == keymap['up']:
-                    self.player.y_vel -= setting.player_speed
-                elif event.key == keymap['down']:
-                    self.player.y_vel += setting.player_speed
-                elif event.key == keymap['left']:
-                    self.player.x_vel -= setting.player_speed
-                elif event.key == keymap['right']:
-                    self.player.x_vel += setting.player_speed
-                elif event.key == keymap['fire']:
-                    self.player.is_fire = True
-                    self.player.fire_control = c.CONTROL_KEYBOARD
+                self.handle_keydown_events(event)
             elif event.type == pygame.KEYUP:
-                if event.key == keymap['up']:
-                    self.player.y_vel += setting.player_speed
-                elif event.key == keymap['down']:
-                    self.player.y_vel -= setting.player_speed
-                elif event.key == keymap['left']:
-                    self.player.x_vel += setting.player_speed
-                elif event.key == keymap['right']:
-                    self.player.x_vel -= setting.player_speed
-                elif event.key == keymap['fire']:
-                    self.player.is_fire = False
+                self.handle_keyup_events(event)
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 self.player.is_fire = True
                 self.player.fire_control = c.CONTROL_MOUSE
@@ -95,6 +82,60 @@ class Game:
                 self.player.is_fire = False
             elif event.type == pygame.QUIT:
                 self.done = True
+            elif event.type == pygame.JOYAXISMOTION:
+                self.handle_joy_axis_events()
+
+    def handle_joy_axis_events(self):
+        # 这里有一个问题：手柄和键盘同时操作时，
+        # 可能会出现不受控制状态，只需把手柄摇杆摇到中间即可解决，更改代码不好处理。
+
+        # improve:这里应该可以分离处理的，但是我不知道怎么改，（可能通过event拿信息？）
+        move_x = self.joystick.get_axis(setting.joystick_axis_move_x)
+        move_y = self.joystick.get_axis(setting.joystick_axis_move_y)
+        fire_x = self.joystick.get_axis(setting.joystick_axis_fire_x)
+        fire_y = self.joystick.get_axis(setting.joystick_axis_fire_y)
+        if abs(move_x) >= setting.joystick_min_motion:
+            self.player.x_vel = setting.player_speed * move_x
+        else:
+            self.player.x_vel = 0.0
+        if abs(move_y) >= setting.joystick_min_motion:
+            self.player.y_vel = setting.player_speed * move_y
+        else:
+            self.player.y_vel = 0.0
+
+        if abs(fire_x) >= setting.joystick_min_motion or abs(fire_y) >= setting.joystick_min_motion:
+            self.player.is_fire = True
+            self.player.fire_control = c.CONTROL_JOYSTICK
+            self.player.fire_dir = atan2(fire_y, fire_x)
+        else:
+            self.player.is_fire = False
+
+    def handle_keydown_events(self, event: pygame.event.Event):
+        keymap = setting.keymap
+        if event.key in keymap[c.CONTROL_UP]:
+            self.player.y_vel -= setting.player_speed
+        elif event.key in keymap[c.CONTROL_DOWN]:
+            self.player.y_vel += setting.player_speed
+        elif event.key in keymap[c.CONTROL_LEFT]:
+            self.player.x_vel -= setting.player_speed
+        elif event.key in keymap[c.CONTROL_RIGHT]:
+            self.player.x_vel += setting.player_speed
+        elif event.key in keymap[c.CONTROL_FIRE]:
+            self.player.is_fire = True
+            self.player.fire_control = c.CONTROL_KEYBOARD
+
+    def handle_keyup_events(self, event: pygame.event.Event):
+        keymap = setting.keymap
+        if event.key in keymap[c.CONTROL_UP]:
+            self.player.y_vel += setting.player_speed
+        elif event.key in keymap[c.CONTROL_DOWN]:
+            self.player.y_vel -= setting.player_speed
+        elif event.key in keymap[c.CONTROL_LEFT]:
+            self.player.x_vel += setting.player_speed
+        elif event.key in keymap[c.CONTROL_RIGHT]:
+            self.player.x_vel -= setting.player_speed
+        elif event.key in keymap[c.CONTROL_FIRE]:
+            self.player.is_fire = False
 
     def check_everything(self):
         if self.player.is_fire:

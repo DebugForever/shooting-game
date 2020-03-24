@@ -17,6 +17,7 @@ class Player(Entity):
         super().__init__(image)
         self.is_fire = False
         self.fire_control = ''  # 开火方式，键盘还是鼠标还是手柄
+        self.fire_dir = 0.0  # 暂存的开火方向，在使用手柄时使用
         self.fire_cd = 0  # 距离下一次能开火的时间
 
     def fire(self, bullets: Group):
@@ -35,7 +36,7 @@ class Player(Entity):
             x, y = pygame.mouse.get_pos()
             direction = atan2(y - self.y, x - self.x)
         elif self.fire_control == c.CONTROL_JOYSTICK:
-            direction = 0.0  # todo joystick support
+            direction = self.fire_dir
 
         bullet = Bullet(image_dict[c.PLAYER_BULLET_NAME])
         bullet.x = self.x
