@@ -39,11 +39,17 @@ class Setting:
 
         # player
         self.player_fire_cd = 10  # 单位是帧，其他类似的也是一样
-        self.player_speed = 4.0
+        self.player_speed = 4.0  # 玩家的移动速度，如果移速可变的话，玩家移动的代码要重写
+
+        # enemy
+        self.enemy_hpbar_height = 10
+        self.enemy_hpbar_color = (0, 220, 0)
+        self.enemy_hpbar_line_color = (255, 255, 255)
+        self.enemy_hpbar_line_width = 1
 
         # joystick
-        self.joystick_min_motion = 0.2
-        self.joystick_axis_move_x = 0
+        self.joystick_min_motion = 0.2  # 检测有效移动的阈值
+        self.joystick_axis_move_x = 0  # 控制移动的摇杆对应的编号，下同
         self.joystick_axis_move_y = 1
         self.joystick_axis_fire_x = 4
         self.joystick_axis_fire_y = 3
@@ -52,12 +58,15 @@ class Setting:
         self.room_size = (1200, 800)
 
         # debug
+        self.debug_default = True
         self.dbgscreen_font_face = 'YaHei Consolas Hybrid'
         self.dbgscreen_font_size = 18
         self.dbgscreen_font_color = pygame.Color('black')
         self.dbgscreen_line_height = 20
-        self.dbgscreen_main_x = int(self.screen_width * 0.1)
+        self.dbgscreen_main_left = int(self.screen_width * 0.1)
         self.dbgscreen_main_top = int(self.screen_height * 0.3)
         self.dbgscreen_main_bottom = int(self.screen_height * 0.9)
-        self.dbgscreen_fps_x = self.dbgscreen_main_x
+        self.dbgscreen_fps_x = self.dbgscreen_main_left
         self.dbgscreen_fps_y = int(self.screen_height * 0.03)
+        self.dbgscreen_hint_right = int(self.screen_width * 0.9)
+        self.dbgscreen_hint_top = self.dbgscreen_fps_y

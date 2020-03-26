@@ -39,7 +39,7 @@ class Game:
         self.canvas = pygame.Surface(setting.room_size)
         self.screen = pygame.display.set_mode(setting.screen_resolution)
         pygame.display.set_caption(setting.caption)
-        self.debug = False
+        self.debug = setting.debug_default
         self.clock = pygame.time.Clock()
 
         if pygame.joystick.get_count() > 0:
@@ -53,7 +53,7 @@ class Game:
 
     def setup_entities(self):
         self.player = Player(image_dict['player'])
-        screen_rect = self.canvas.get_rect()
+        screen_rect = self.canvas.get_rect()  # 感觉这样搞破坏了封装性似乎有点不妥？
         self.player.x = screen_rect.centerx
         self.player.y = screen_rect.centery
         self.player.viewport = self.viewport
@@ -138,6 +138,13 @@ class Game:
         elif event.key in keymap[c.CONTROL_FIRE]:
             self.player.is_fire = False
 
+    def check_collision_be(self):
+        """
+        检测子弹与敌人之间的碰撞，并处理这些碰撞
+        :return:
+        """
+        collision = pygame.sprite.groupcollide(self.bullets_p, self.enemies, True, False)
+
     def check_everything(self):
         if self.player.is_fire:
             self.player.fire(self.bullets_p)
@@ -175,8 +182,10 @@ class Game:
     def draw_everything(self):
         # 先执行的绘画会在最底下
         self.canvas.fill((220, 220, 220))
-        self.enemies.draw(self.canvas)
-        self.bullets_p.draw(self.canvas)
+        for enemy in self.enemies:
+            enemy.draw(self.canvas)
+        for bullet in self.bullets_p:
+            bullet.draw(self.canvas)
         self.player.draw(self.canvas)
         self.screen.blit(self.canvas, (0, 0), self.viewport)
         if self.debug:

@@ -21,6 +21,11 @@ class Player(Entity):
         self.fire_cd = 0  # 距离下一次能开火的时间
         self.viewport = pygame.Rect(0, 0, 0, 0)  # 是外面的这个的引用，用于计算玩家在屏幕上的实际位置
 
+        # combat stats
+        self.hp = 100
+        self.maxhp = 100
+        self.atk = 10
+
     def fire(self, bullets: Group):
         """
         射出子弹，方向由操控方式决定，如果在CD则不发射
