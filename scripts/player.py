@@ -9,7 +9,7 @@ from .bullet import Bullet
 from math import atan2
 from . import image_dict
 from . import constants as c
-from . import setting
+from . import setting, dbgscreen
 
 
 class Player(Entity):
@@ -19,6 +19,7 @@ class Player(Entity):
         self.fire_control = ''  # 开火方式，键盘还是鼠标还是手柄
         self.fire_dir = 0.0  # 暂存的开火方向，在使用手柄时使用
         self.fire_cd = 0  # 距离下一次能开火的时间
+        self.viewport = pygame.Rect(0, 0, 0, 0)  # 是外面的这个的引用，用于计算玩家在屏幕上的实际位置
 
     def fire(self, bullets: Group):
         """
@@ -33,8 +34,8 @@ class Player(Entity):
         if self.fire_control == c.CONTROL_KEYBOARD:
             direction = self.direction
         elif self.fire_control == c.CONTROL_MOUSE:
-            x, y = pygame.mouse.get_pos()
-            direction = atan2(y - self.y, x - self.x)
+            mx, my = pygame.mouse.get_pos()
+            direction = atan2(my + self.viewport.y - self.y, mx + self.viewport.x - self.x)
         elif self.fire_control == c.CONTROL_JOYSTICK:
             direction = self.fire_dir
 
