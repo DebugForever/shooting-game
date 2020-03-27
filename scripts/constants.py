@@ -11,9 +11,16 @@ CONTROL_MOUSE = 'mouse'
 CONTROL_KEYBOARD = 'keyboard'
 CONTROL_JOYSTICK = 'joystick'
 
+# 按键相关
 CONTROL_UP = 'up'
 CONTROL_DOWN = 'down'
 CONTROL_LEFT = 'left'
 CONTROL_RIGHT = 'right'
 CONTROL_FIRE = 'fire'
 CONTROL_DEBUG = 'fps'
+
+# 怪物ai状态相关
+STATUS_TYPE = str
+STATUS_IDLE = 'idle'  # 待机
+STATUS_MOVE = 'move'  # 移动
+STATUS_FIRE = 'fire'  # 射击前后摇，没有动画的话暂时用不上这个状态

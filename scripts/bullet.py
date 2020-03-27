@@ -10,5 +10,9 @@ import pygame
 class Bullet(Entity):
     def __init__(self, image: pygame.Surface):
         super().__init__(image)
+        self.damage = 0
 
-    # todo 记得在子弹射出屏幕时销毁，或者设置屏幕周围的屏障，否则游戏会越跑越卡
+    def setup(self, x: float, y: float, dmg: int):
+        self.x = x
+        self.y = y
+        self.damage = dmg

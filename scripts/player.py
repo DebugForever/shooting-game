@@ -16,10 +16,14 @@ class Player(Entity):
     def __init__(self, image: pygame.Surface):
         super().__init__(image)
         self.is_fire = False
-        self.fire_control = ''  # 开火方式，键盘还是鼠标还是手柄
-        self.fire_dir = 0.0  # 暂存的开火方向，在使用手柄时使用
-        self.fire_cd = 0  # 距离下一次能开火的时间
-        self.viewport = pygame.Rect(0, 0, 0, 0)  # 是外面的这个的引用，用于计算玩家在屏幕上的实际位置
+        self.fire_control = ''
+        """开火方式，键盘还是鼠标还是手柄"""
+        self.fire_dir = 0.0
+        """暂存的开火方向，在使用手柄时使用"""
+        self.fire_cd = 0
+        """距离下一次能开火的时间"""
+        self.viewport = pygame.Rect(0, 0, 0, 0)
+        """是外面的这个的引用(Game.viewport)，用于计算玩家在屏幕上的实际位置"""
 
         # combat stats
         self.hp = 100
@@ -45,8 +49,7 @@ class Player(Entity):
             direction = self.fire_dir
 
         bullet = Bullet(image_dict[c.PLAYER_BULLET_NAME])
-        bullet.x = self.x
-        bullet.y = self.y
+        bullet.setup(self.x, self.y, self.atk)
         bullet.set_dir_v(direction, setting.bullet_speed_p)
         bullets.add(bullet)
         self.fire_cd = setting.player_fire_cd
@@ -54,3 +57,9 @@ class Player(Entity):
     def update(self):
         super().update()
         self.fire_cd -= 1
+
+    def draw(self, screen: pygame.Surface):
+        super().draw(screen)  # 这段代码是复制过来的，因为不想再做一层继承
+        hp_bar_rect = pygame.Rect(self.rect.bottomleft, (self.rect.width, setting.player_hpbar_height))
+        pygame.draw.rect(screen, setting.player_hpbar_color_high, hp_bar_rect)  # 画血条
+        pygame.draw.rect(screen, setting.player_hpbar_line_color, hp_bar_rect, setting.player_hpbar_line_width)  # 画边框

@@ -12,11 +12,17 @@ class Setting:
         # display
         self.screen_width = 800
         self.screen_height = 600
-        self.screen_resolution = (self.screen_width, self.screen_height)  # 分辨率
-        self.caption = 'shooting game'  # 游戏标题
-        ''' 需要锁帧率。因为攻击间隔等效果的实现都依赖帧率，
-        不锁帧会导致游戏的速度在不同的机器上有不同的表现'''
+        self.screen_resolution = (self.screen_width, self.screen_height)
+        """分辨率，宽*高"""
+        self.caption = 'shooting game'
+        """游戏标题"""
+
         self.fps_limit = 60
+        '''
+        帧率上限。
+        需要锁帧率。因为攻击间隔等效果的实现都依赖帧率，
+        不锁帧会导致游戏的速度在不同的机器上有不同的表现。
+        '''
         self.scroll_dis_x = self.screen_width / 6  # 离边缘多少距离开始滚屏
         self.scroll_dis_y = self.screen_height / 6
 
@@ -34,12 +40,22 @@ class Setting:
         self.event_allowed = [pgc.JOYAXISMOTION, pgc.MOUSEBUTTONDOWN, pgc.MOUSEBUTTONUP, pgc.KEYDOWN, pgc.KEYUP]
 
         # bullet
-        self.bullet_speed_p = 8.0  # 玩家射出子弹的初始速度
-        self.bullet_speed_e = 2.0  # 敌人射出子弹的初始速度
+        self.bullet_speed_p = 8.0
+        """玩家射出子弹的初始速度"""
+        self.bullet_speed_e = 2.0
+        """敌人射出子弹的初始速度"""
 
         # player
-        self.player_fire_cd = 10  # 单位是帧，其他类似的也是一样
-        self.player_speed = 4.0  # 玩家的移动速度，如果移速可变的话，玩家移动的代码要重写
+        self.player_fire_cd = 10
+        """单位是帧，其他类似的也是一样"""
+        self.player_speed = 4.0
+        """玩家的移动速度，如果移速可变的话，玩家移动的代码要重写"""
+        self.player_hpbar_height = 10
+        self.player_hpbar_color_high = (0, 220, 0)
+        self.player_hpbar_color_mid = (220, 220, 0)
+        self.player_hpbar_color_low = (220, 0, 0)
+        self.player_hpbar_line_color = (255, 255, 255)
+        self.player_hpbar_line_width = 1
 
         # enemy
         self.enemy_hpbar_height = 10
@@ -48,8 +64,10 @@ class Setting:
         self.enemy_hpbar_line_width = 1
 
         # joystick
-        self.joystick_min_motion = 0.2  # 检测有效移动的阈值
-        self.joystick_axis_move_x = 0  # 控制移动的摇杆对应的编号，下同
+        self.joystick_min_motion = 0.2
+        """检测有效移动的阈值"""
+        self.joystick_axis_move_x = 0
+        """控制移动的摇杆对应的编号，下同"""
         self.joystick_axis_move_y = 1
         self.joystick_axis_fire_x = 4
         self.joystick_axis_fire_y = 3

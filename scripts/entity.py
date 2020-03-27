@@ -1,6 +1,6 @@
 """
 实体类，是游戏所有实体的基类
-contains entity base class
+contains entity base class, and other entity-like objects
 """
 
 from pygame.sprite import Sprite
@@ -16,10 +16,7 @@ class Entity(Sprite):
 
     @velocity.setter
     def velocity(self, new_vel):
-        now_vel = sqrt(self.x_vel ** 2 + self.y_vel ** 2)
-        mult = new_vel / now_vel
-        self.x_vel *= mult
-        self.y_vel *= mult
+        self.set_dir_v(self.direction, new_vel)
 
     @property
     def direction(self):
@@ -34,7 +31,7 @@ class Entity(Sprite):
 
     @x.setter
     def x(self, new_x: float):
-        # 把xy实现成虚拟属性是为了方便，因为xy坐标应始终与物体的碰撞箱同步，否则容易出bug
+        """把xy实现成虚拟属性是为了方便，因为xy坐标应始终与物体的碰撞箱同步，否则容易出bug"""
         self._x = new_x
         self.rect.centerx = self._x
 
@@ -52,8 +49,10 @@ class Entity(Sprite):
 
         self._x = 0.0
         self._y = 0.0
-        self.x_vel = 0.0  # velocity in x axis
-        self.y_vel = 0.0  # velocity in y axis
+        self.x_vel = 0.0
+        """x轴分速度  velocity in x axis"""
+        self.y_vel = 0.0
+        """y轴分速度  velocity in y axis"""
 
         self.image = image
         self.rect: pygame.Rect = self.image.get_rect()
@@ -83,3 +82,10 @@ class Entity(Sprite):
 
     def draw(self, screen: pygame.Surface):
         screen.blit(self.image, self.rect)
+
+    def make_in_bound(self, rect: pygame.Rect):
+        self.rect.left = max(self.rect.left, rect.left)
+        self.rect.top = max(self.rect.top, rect.top)
+        self.rect.right = min(self.rect.right, rect.right)
+        self.rect.bottom = min(self.rect.bottom, rect.bottom)
+        self._x, self._y = self.rect.center
