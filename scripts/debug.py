@@ -10,6 +10,7 @@ from typing import Union, Any
 class DebugScreen:
     """
     显示，绘制debug屏幕，接收发来的debug信息，并显现在屏幕上
+    todo:给每个实体加上id，并且在debug模式下显示id
     """
 
     def __init__(self):

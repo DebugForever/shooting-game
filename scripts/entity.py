@@ -9,6 +9,10 @@ from math import sqrt, atan2, sin, cos
 
 
 class Entity(Sprite):
+    """
+    实体类，是游戏所有实体的基类，包含xy和xy速度的属性
+    """
+
     @property
     def velocity(self):
         """虚拟属性：速度（标量）"""
@@ -66,6 +70,10 @@ class Entity(Sprite):
         """
         self.x_vel = velocity * cos(direction)
         self.y_vel = velocity * sin(direction)
+
+    def set_xy(self, x: float, y: float):
+        self.x = x
+        self.y = y
 
     def sync_rect_xy(self):
         """

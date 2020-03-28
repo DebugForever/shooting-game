@@ -23,4 +23,4 @@ CONTROL_DEBUG = 'fps'
 STATUS_TYPE = str
 STATUS_IDLE = 'idle'  # 待机
 STATUS_MOVE = 'move'  # 移动
-STATUS_FIRE = 'fire'  # 射击前后摇，没有动画的话暂时用不上这个状态
+STATUS_FIRE = 'fire'  # 射击

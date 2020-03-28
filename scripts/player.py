@@ -61,5 +61,11 @@ class Player(Entity):
     def draw(self, screen: pygame.Surface):
         super().draw(screen)  # 这段代码是复制过来的，因为不想再做一层继承
         hp_bar_rect = pygame.Rect(self.rect.bottomleft, (self.rect.width, setting.player_hpbar_height))
-        pygame.draw.rect(screen, setting.player_hpbar_color_high, hp_bar_rect)  # 画血条
+        hp_rect = hp_bar_rect.copy()
+        hp_ratio = self.hp / self.maxhp
+        hp_rect.width *= hp_ratio
+        hp_rect.left = hp_bar_rect.left
+        if hp_rect.right < hp_rect.left:  # 处理负血条
+            hp_rect.width = 0
+        pygame.draw.rect(screen, setting.player_hpbar_color_high, hp_rect)  # 画血条
         pygame.draw.rect(screen, setting.player_hpbar_line_color, hp_bar_rect, setting.player_hpbar_line_width)  # 画边框

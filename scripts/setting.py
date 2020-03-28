@@ -42,8 +42,6 @@ class Setting:
         # bullet
         self.bullet_speed_p = 8.0
         """玩家射出子弹的初始速度"""
-        self.bullet_speed_e = 2.0
-        """敌人射出子弹的初始速度"""
 
         # player
         self.player_fire_cd = 10

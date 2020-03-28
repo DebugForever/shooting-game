@@ -59,12 +59,14 @@ class Game:
         self.player.viewport = self.viewport  # 感觉这样搞破坏了封装性似乎有点不妥？
 
         self.enemies = Group()
-        self.room.generate(self.enemies)
-
+        """所有敌人的群组"""
         self.bullets_p = Group()
         """玩家射出的子弹"""
         self.bullets_e = Group()
         """敌人射出的子弹"""
+        # 注册room内的这些东西，这么写感觉很抠脚，有没有改进方法呢？
+        self.room.setup(self.enemies, self.bullets_p, self.bullets_e, self.player)
+        self.room.generate(self.enemies)
 
     def handle_events(self):
         """
@@ -155,10 +157,23 @@ class Game:
             if enemy.hp <= 0:
                 enemy.kill()  # kill函数会把它从所有群组里移除（pygame提供）
 
+    def check_collision_bp(self):
+        """
+        检测子弹与玩家之间的碰撞，并处理这些碰撞
+        bp:bullet and player
+        :return:
+        """
+        collision = pygame.sprite.spritecollide(self.player, self.bullets_e, True)
+        for bullet in collision:
+            self.player.hp -= bullet.damage
+        if self.player.hp <= 0:
+            pass  # 先占个坑，以后再写
+
     def check_everything(self):
         if self.player.is_fire:
             self.player.fire(self.bullets_p)
         self.check_collision_be()
+        self.check_collision_bp()
         self.scroll_screen()
 
     def scroll_screen(self):
@@ -205,6 +220,7 @@ class Game:
         dbgscreen.set_fps(int(self.clock.get_fps()))
         self.player.update()
         self.bullets_p.update()
+        self.bullets_e.update()
         self.enemies.update()
         self.make_all_in_bound()
 
@@ -215,16 +231,28 @@ class Game:
             enemy.draw(self.canvas)
         for bullet in self.bullets_p:
             bullet.draw(self.canvas)
+        for bullet in self.bullets_e:
+            bullet.draw(self.canvas)
         self.player.draw(self.canvas)
         self.screen.blit(self.canvas, (0, 0), self.viewport)
         if self.debug:
             dbgscreen.draw(self.screen)
+
+    def enemy_ai(self):
+        """
+        总感觉这个名字取得不是很好。
+        调用所有敌人的ai()函数，处理它们的所有行动
+        :return:
+        """
+        for enemy in self.enemies:
+            enemy.ai()
 
     def run(self):
         while not self.done:
             dbgscreen.show('(debug)bullet_count:{}'.format(len(self.bullets_p) + len(self.bullets_e)))
             self.handle_events()
             self.check_everything()
+            self.enemy_ai()
             self.update_everything()
             self.draw_everything()
             pygame.display.flip()
