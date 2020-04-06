@@ -12,11 +12,12 @@ class Entity(Sprite):
     """
     实体类，是游戏所有实体的基类，包含xy和xy速度的属性
     """
+    _dir: float
 
     @property
     def velocity(self):
         """虚拟属性：速度（标量）"""
-        return sqrt(self.x_vel ** 2 + self.y_vel ** 2)
+        return sqrt(self._x_vel ** 2 + self._y_vel ** 2)
 
     @velocity.setter
     def velocity(self, new_vel):
@@ -25,9 +26,10 @@ class Entity(Sprite):
     @property
     def direction(self):
         """虚拟属性：面朝角度"""
-        if self.x_vel == 0 and self.y_vel == 0:  # 没有速度默认为0角度，否则atan2会报错
-            return 0.0
-        return atan2(self.y_vel, self.x_vel)
+        if self._x_vel == 0 and self._y_vel == 0:  # 没有速度默认为0角度，否则atan2会报错
+            return self._dir
+        self._dir = atan2(self._y_vel, self._x_vel)
+        return self._dir
 
     @property
     def x(self):
@@ -48,14 +50,39 @@ class Entity(Sprite):
         self._y = new_y
         self.rect.centery = self._y
 
+    @property
+    def x_vel(self):
+        """
+        为了解决停止时无法保存方向的问题，把x_vel和y_vel也写成了虚拟属性
+        """
+        return self._x_vel
+
+    @x_vel.setter
+    def x_vel(self, new_val):
+        self._x_vel = new_val
+        if self._x_vel != 0 or self._y_vel != 0:
+            self._dir = atan2(self._y_vel, self._x_vel)
+
+    @property
+    def y_vel(self):
+        return self._y_vel
+
+    @y_vel.setter
+    def y_vel(self, new_val):
+        self._y_vel = new_val
+        if self._x_vel != 0 or self._y_vel != 0:
+            self._dir = atan2(self._y_vel, self._x_vel)
+
     def __init__(self, image: pygame.Surface):
         super().__init__()
 
         self._x = 0.0
         self._y = 0.0
-        self.x_vel = 0.0
+        self._dir = 0.0
+        """面朝方向，仅当速度为0时生效"""
+        self._x_vel = 0.0
         """x轴分速度  velocity in x axis"""
-        self.y_vel = 0.0
+        self._y_vel = 0.0
         """y轴分速度  velocity in y axis"""
 
         self.image = image
@@ -68,8 +95,9 @@ class Entity(Sprite):
         :param direction: 新的面朝角度
         :param velocity: 新的速度
         """
-        self.x_vel = velocity * cos(direction)
-        self.y_vel = velocity * sin(direction)
+        self._x_vel = velocity * cos(direction)
+        self._y_vel = velocity * sin(direction)
+        self._dir = direction
 
     def set_xy(self, x: float, y: float):
         self.x = x
@@ -84,8 +112,8 @@ class Entity(Sprite):
         self.rect.centery = int(self._y)
 
     def update(self):
-        self._x += self.x_vel
-        self._y += self.y_vel
+        self._x += self._x_vel
+        self._y += self._y_vel
         self.sync_rect_xy()
 
     def draw(self, screen: pygame.Surface):
