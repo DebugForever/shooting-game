@@ -29,14 +29,14 @@ class Game:
     joystick: pygame.joystick.Joystick
     room: Room
     debug: bool
-    game_status:bool
+    active:bool
     play_button:Button #关于游戏活动状态与否
 
     def __init__(self):
         pygame.event.set_allowed(setting.event_allowed)
         self.setup()
         self.done = False
-        self.game_status = False#初始时游戏状态为False
+        self.active = False#初始时游戏状态为False
 
     def setup(self):
         self.canvas = pygame.Surface(setting.room_size)
@@ -81,7 +81,7 @@ class Game:
         :return:
         """
         for event in pygame.event.get():
-            if not self.game_status :
+            if not self.active :
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse_x,mouse_y = pygame.mouse.get_pos()
                     self.handle_check_play_button(mouse_x,mouse_y)
@@ -108,8 +108,8 @@ class Game:
         检查鼠标按键是否点击了botton
         """
         if self.play_button.rect.collidepoint(mouse_x,mouse_y):
-            self.game_status = True
-        if self.game_status:
+            self.active = True
+        if self.active:
             self.game_restart()
 
     def handle_joy_axis_events(self):
@@ -191,7 +191,7 @@ class Game:
         for bullet in collision:
             self.player.hp -= bullet.damage
         if self.player.hp <= 0:
-            self.game_status = False
+            self.active = False
             pass  # 先占个坑，以后再写
 
     def check_everything(self):
@@ -263,7 +263,7 @@ class Game:
         if self.debug:
             dbgscreen.draw(self.screen)
 
-        if not self.game_status:
+        if not self.active:
             self.play_button.draw()
 
     def enemy_ai(self):
@@ -294,9 +294,8 @@ class Game:
             只有当游戏启动时敌人才会移动
             数组才会更新
             """
-            if self.game_status:
-                self.enemy_ai()
-                self.update_everything()
+            if self.active: self.enemy_ai()
+            if self.active: self.update_everything()
             self.draw_everything()
             pygame.display.flip()
             self.clock.tick(setting.fps_limit)  # 限制帧数。同时，只有用了tick，pygame内置的fps()才能使用
