@@ -29,8 +29,8 @@ class Game:
     joystick: pygame.joystick.Joystick
     room: Room
     debug: bool
-    active:bool
-    play_button:Button #关于游戏活动状态与否
+    active:bool#关于游戏活动状态与否
+    play_button:Button
 
     def __init__(self):
         pygame.event.set_allowed(setting.event_allowed)
