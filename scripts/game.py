@@ -11,7 +11,7 @@ from .player import Player
 from .enemy import Enemy
 from . import constants as c
 from .room import Room
-
+from .button import Button
 
 class Game:
     """
@@ -29,11 +29,14 @@ class Game:
     joystick: pygame.joystick.Joystick
     room: Room
     debug: bool
+    game_status:bool
+    play_button:Button #关于游戏活动状态与否
 
     def __init__(self):
         pygame.event.set_allowed(setting.event_allowed)
         self.setup()
         self.done = False
+        self.game_status = False#初始时游戏状态为False
 
     def setup(self):
         self.canvas = pygame.Surface(setting.room_size)
@@ -50,6 +53,10 @@ class Game:
         self.viewport = pygame.rect.Rect(0, 0, *setting.screen_resolution)
         self.viewport.center = self.room.rect.center
         self.setup_entities()
+        """
+        按钮的设置
+        """
+        self.play_button = Button(self.screen,"Play")
 
     def setup_entities(self):
         self.player = Player(image_dict['player'])
@@ -74,6 +81,14 @@ class Game:
         :return:
         """
         for event in pygame.event.get():
+            if not self.game_status :
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    mouse_x,mouse_y = pygame.mouse.get_pos()
+                    self.handle_check_play_button(mouse_x,mouse_y)
+                elif event.type == pygame.QUIT:
+                    self.done = True
+                else:
+                    continue
             if event.type == pygame.KEYDOWN:
                 self.handle_keydown_events(event)
             elif event.type == pygame.KEYUP:
@@ -87,7 +102,16 @@ class Game:
                 self.done = True
             elif event.type == pygame.JOYAXISMOTION:
                 self.handle_joy_axis_events()
-
+    
+    def handle_check_play_button(self,mouse_x,mouse_y):
+        """
+        检查鼠标按键是否点击了botton
+        """
+        if self.play_button.rect.collidepoint(mouse_x,mouse_y):
+            self.game_status = True
+        if self.game_status:
+            self.game_restart()
+    
     def handle_joy_axis_events(self):
         """
         这里有一个问题：手柄和键盘同时操作时，
@@ -167,6 +191,7 @@ class Game:
         for bullet in collision:
             self.player.hp -= bullet.damage
         if self.player.hp <= 0:
+            self.game_status = False
             pass  # 先占个坑，以后再写
 
     def check_everything(self):
@@ -237,6 +262,9 @@ class Game:
         self.screen.blit(self.canvas, (0, 0), self.viewport)
         if self.debug:
             dbgscreen.draw(self.screen)
+        
+        if not self.game_status:
+            self.play_button.draw()
 
     def enemy_ai(self):
         """
@@ -246,15 +274,30 @@ class Game:
         """
         for enemy in self.enemies:
             enemy.ai()
-
+            
+    def game_restart(self):
+        """
+        游戏重新启动:包括步骤：清空之前所有的数组
+        重新放入数组
+        """
+        self.enemies.empty()
+        self.bullets_e.empty()
+        self.bullets_p.empty()
+        self.setup_entities()
+    
     def run(self):
         while not self.done:
             dbgscreen.show('(debug)bullet_count:{}'.format(len(self.bullets_p) + len(self.bullets_e)))
             self.handle_events()
             self.check_everything()
-            self.enemy_ai()
-            self.update_everything()
+            """
+            只有当游戏启动时敌人才会移动
+            数组才会更新
+            """
+            if self.game_status: self.enemy_ai()
+            if self.game_status: self.update_everything()
             self.draw_everything()
             pygame.display.flip()
             self.clock.tick(setting.fps_limit)  # 限制帧数。同时，只有用了tick，pygame内置的fps()才能使用
+            
         pygame.quit()
