@@ -8,7 +8,11 @@ from typing import Optional
 import pygame
 from . import setting
 from pygame.sprite import Group
-from .enemy import Slime, Enemy
+from .enemy import Slime
+from .enemy import Slime2
+from .enemy import Slime3
+from .enemy import Orangutan
+from .enemy import Boss
 from .entity import Entity
 from .player import Player
 from .block import Block
