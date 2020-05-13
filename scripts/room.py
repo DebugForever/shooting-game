@@ -6,6 +6,10 @@ import pygame
 from . import setting
 from pygame.sprite import Group
 from .enemy import Slime
+from .enemy import Slime2
+from .enemy import Slime3
+from .enemy import Orangutan
+from .enemy import Boss
 from .player import Player
 
 
@@ -37,7 +41,7 @@ class Room:
         enemy2 = Slime()
         enemy2.x = 200
         enemy2.y = 200
-        enemy3 = Slime()
+        enemy3 = Boss()
         enemy3.x = 300
         enemy3.y = 300
         enemies.add(enemy1, enemy2, enemy3)
