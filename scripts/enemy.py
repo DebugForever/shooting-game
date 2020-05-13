@@ -139,6 +139,7 @@ class Enemy(Entity):
         self.status_time -= 1
 
 
+# todo 给下面的怪物改一个适合的名字
 class Slime(Enemy):
     def __init__(self):
         super().__init__(image_dict['slime'])
@@ -158,7 +159,7 @@ class Slime(Enemy):
             self.status_queue.append((c.STATUS_FIRE, 0, [self.bullet_group]))
         self.handle_status_queue()
 
-"""懒得取名字了"""
+
 class Slime2(Enemy):
     def __init__(self):
         super().__init__(image_dict['slime2'])
@@ -179,6 +180,7 @@ class Slime2(Enemy):
             self.status_queue.append((c.STATUS_IDLE, 10, []))
             self.status_queue.append((c.STATUS_FIRE, 0, [self.bullet_group]))
         self.handle_status_queue()
+
 
 class Slime3(Enemy):
     def __init__(self):
@@ -201,18 +203,10 @@ class Slime3(Enemy):
             self.status_queue.append((c.STATUS_FIRE, 0, [self.bullet_group]))
         self.handle_status_queue()
 
-    def ai(self):
-        dbgscreen.show(self.status)
-        if len(self.status_queue) == 0:
-            self.status_queue.append((c.STATUS_IDLE, 30, []))
-            self.status_queue.append((c.STATUS_MOVE, 30, [self.target.x, self.target.y]))
-            self.status_queue.append((c.STATUS_FIRE, 0, [self.bullet_group]))
-            self.status_queue.append((c.STATUS_IDLE, 10, []))
-            self.status_queue.append((c.STATUS_FIRE, 0, [self.bullet_group]))
-        self.handle_status_queue()
 
-"""猩猩"""
 class Orangutan(Enemy):
+    """猩猩"""
+
     def __init__(self):
         super().__init__(image_dict['orangutan'])
         """猩猩更耐揍"""
@@ -234,8 +228,10 @@ class Orangutan(Enemy):
             self.status_queue.append((c.STATUS_FIRE, 0, [self.bullet_group]))
         self.handle_status_queue()
 
-"""因为是boss所以长得比较大只"""
+
 class Boss(Enemy):
+    """因为是boss所以长得比较大只"""
+
     def __init__(self):
         super().__init__(image_dict['boss'])
         """设定为终极boss"""
@@ -256,6 +252,3 @@ class Boss(Enemy):
             self.status_queue.append((c.STATUS_IDLE, 10, []))
             self.status_queue.append((c.STATUS_FIRE, 0, [self.bullet_group]))
         self.handle_status_queue()
-
-
-

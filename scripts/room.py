@@ -73,9 +73,9 @@ class BattleRoom(Room):
 
         # 先在上方和下方各生成2个
         self.spawn_enemy(Slime(), self.rect.centerx - 100, self.rect.top + 100)
-        self.spawn_enemy(Slime(), self.rect.centerx + 100, self.rect.top + 100)
-        self.spawn_enemy(Slime(), self.rect.centerx - 100, self.rect.bottom - 100)
-        self.spawn_enemy(Slime(), self.rect.centerx + 100, self.rect.bottom - 100)
+        self.spawn_enemy(Slime2(), self.rect.centerx + 100, self.rect.top + 100)
+        self.spawn_enemy(Slime3(), self.rect.centerx - 100, self.rect.bottom - 100)
+        self.spawn_enemy(Orangutan(), self.rect.centerx + 100, self.rect.bottom - 100)
 
         # 之后随机生成4个，如果有重叠则放弃生成
         for i in range(max_enemy_num - enemy_num_static):
