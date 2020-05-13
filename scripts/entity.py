@@ -111,6 +111,15 @@ class Entity(Sprite):
         self.rect.centerx = int(self._x)
         self.rect.centery = int(self._y)
 
+    def sync_xy_rect(self):
+        """
+        将自身的xy和矩形位置同步，只更改矩形位置的时候需要用到
+        improve:一个更好的方法是，实现rect的所有虚拟属性，并在修改后同步（但是实在是太多了）
+        :return:None
+        """
+        self._x = self.rect.centerx
+        self._y = self.rect.centery
+
     def update(self):
         self._x += self._x_vel
         self._y += self._y_vel

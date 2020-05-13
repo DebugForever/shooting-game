@@ -30,6 +30,9 @@ class Enemy(Entity):
         """最大速度"""
         self.bullet_speed = 1
 
+        self.can_fire = True
+        """标志这种怪物能否开火"""
+
         # 怪物ai有关的属性，或许[状态设计模式]可能有用？
         self.status = c.STATUS_IDLE
         """当前状态"""
@@ -147,7 +150,6 @@ class Slime(Enemy):
         self.max_speed = 2
 
     def ai(self):
-        dbgscreen.show(self.status)
         if len(self.status_queue) == 0:
             self.status_queue.append((c.STATUS_IDLE, 30, []))
             self.status_queue.append((c.STATUS_MOVE, 30, [self.target.x, self.target.y]))

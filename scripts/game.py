@@ -7,10 +7,12 @@ import pygame
 from pygame.sprite import Group
 from math import sin, cos, atan2
 from . import setting, image_dict, dbgscreen
+from .entity import Entity
 from .player import Player
 from .enemy import Enemy
 from . import constants as c
-from .room import Room
+from .room import Room, BattleRoom
+from .tools import fix_entity_collision
 
 
 class Game:
@@ -24,6 +26,7 @@ class Game:
     enemies: Group
     bullets_p: Group
     bullets_e: Group
+    obstacles: Group
     viewport: pygame.Rect
     clock: pygame.time.Clock
     joystick: pygame.joystick.Joystick
@@ -46,7 +49,7 @@ class Game:
             self.joystick = pygame.joystick.Joystick(0)
             self.joystick.init()
 
-        self.room = Room()
+        self.room = BattleRoom()
         self.viewport = pygame.rect.Rect(0, 0, *setting.screen_resolution)
         self.viewport.center = self.room.rect.center
         self.setup_entities()
@@ -64,9 +67,11 @@ class Game:
         """玩家射出的子弹"""
         self.bullets_e = Group()
         """敌人射出的子弹"""
+        self.obstacles = Group()
+        """障碍物"""
         # 注册room内的这些东西，这么写感觉很抠脚，有没有改进方法呢？
-        self.room.setup(self.enemies, self.bullets_p, self.bullets_e, self.player)
-        self.room.generate(self.enemies)
+        self.room.setup(self.enemies, self.bullets_p, self.bullets_e, self.obstacles, self.player)
+        self.room.generate()
 
     def handle_events(self):
         """
@@ -233,6 +238,8 @@ class Game:
             bullet.draw(self.canvas)
         for bullet in self.bullets_e:
             bullet.draw(self.canvas)
+        for obstacle in self.obstacles:
+            obstacle.draw(self.canvas)
         self.player.draw(self.canvas)
         self.screen.blit(self.canvas, (0, 0), self.viewport)
         if self.debug:
@@ -247,13 +254,35 @@ class Game:
         for enemy in self.enemies:
             enemy.ai()
 
+    def fix_block_entity_collision(self):
+        """
+        处理实体与障碍物之间的碰撞（重叠）。
+        对于子弹：销毁
+        对于其他实体：移动至范围外面
+        """
+
+        # 清除碰撞的子弹
+        for group in self.bullets_e, self.bullets_p:
+            pygame.sprite.groupcollide(group, self.obstacles, True, False)
+
+        collision = pygame.sprite.groupcollide(self.obstacles, self.enemies, False, False)
+        for block, collided_enemys in collision.items():
+            for enemy in collided_enemys:
+                fix_entity_collision(enemy, block)
+
+        collision = pygame.sprite.spritecollide(self.player, self.obstacles, False)
+        if collision:
+            fix_entity_collision(self.player, collision[0])
+
     def run(self):
         while not self.done:
             dbgscreen.show('(debug)bullet_count:{}'.format(len(self.bullets_p) + len(self.bullets_e)))
+            dbgscreen.show(f'enemy_count:{len(self.enemies)}')
             self.handle_events()
             self.check_everything()
             self.enemy_ai()
             self.update_everything()
+            self.fix_block_entity_collision()
             self.draw_everything()
             pygame.display.flip()
             self.clock.tick(setting.fps_limit)  # 限制帧数。同时，只有用了tick，pygame内置的fps()才能使用
