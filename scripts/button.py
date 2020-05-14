@@ -33,7 +33,7 @@ class Button():
         self.screen.blit(self.msg_image, self.msg_image_rect)
 
 
-class List():
+class Menu():
     """
     菜单选项，用于弹出菜单，其中option用于描述众多选项
     option_continue:继续游戏

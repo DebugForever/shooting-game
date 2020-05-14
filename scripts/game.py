@@ -16,7 +16,7 @@ from .room import Room, BattleRoom
 from .tools import fix_entity_collision
 
 from .room import Room
-from .button import List
+from .button import Menu
 
 
 class Game:
@@ -38,7 +38,7 @@ class Game:
     debug: bool
     active: str
     #  关于游戏活动状态，对应的状态设置在了constants
-    play_list: List
+    play_list: Menu
     #  一个集成了所有菜单的类，包括play按钮，menu，list功能
 
     def __init__(self):
@@ -63,7 +63,7 @@ class Game:
         self.viewport.center = self.room.rect.center
         self.setup_entities()
 
-        self.play_list = List(self.screen)
+        self.play_list = Menu(self.screen)
         self.active = c.ACTIVE_START
 
     def setup_entities(self):
