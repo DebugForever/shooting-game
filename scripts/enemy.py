@@ -12,24 +12,13 @@ from . import constants as c, dbgscreen
 from . import image_dict
 from . import setting
 from .bullet import Bullet
+from .creature import Creature
 from .entity import Entity
 
 
-class Enemy(Entity):
+class Enemy(Creature):
     def __init__(self, image: pygame.Surface):
         super().__init__(image)
-        # 战斗有关的属性，以下为默认值，没有什么用（还不是因为python没有变量声明），一定要覆盖这些值
-        # 这里写上这些值主要是为了方便IDE提示
-        self.maxhp = 1
-        self.hp = 1
-        self.atk = 1
-        self.gold = 1
-        self.speed = 1.0
-        """当前速度"""
-        self.max_speed = 1.0
-        """最大速度"""
-        self.bullet_speed = 1
-
         self.can_fire = True
         """标志这种怪物能否开火"""
 
@@ -55,18 +44,6 @@ class Enemy(Entity):
         """
         self.target = target
         self.bullet_group = bullet_group
-
-    def update(self):
-        self.velocity = self.speed  # 先同步速度属性，这样可以处理加减速的buff效果
-        super().update()  # 其他代码不变
-
-    def draw(self, screen: pygame.Surface):
-        super().draw(screen)  # 先画出图像
-        hp_bar_rect = pygame.Rect(self.rect.bottomleft, (self.rect.width, setting.enemy_hpbar_height))
-        hp_rect = hp_bar_rect.copy()
-        hp_rect.width = hp_rect.width * (self.hp / self.maxhp)
-        pygame.draw.rect(screen, setting.enemy_hpbar_color, hp_rect)  # 画血条
-        pygame.draw.rect(screen, setting.enemy_hpbar_line_color, hp_bar_rect, setting.enemy_hpbar_line_width)  # 画边框
 
     def idle(self):
         """
@@ -172,7 +149,6 @@ class Slime2(Enemy):
         self.max_speed = 1
 
     def ai(self):
-        dbgscreen.show(self.status)
         if len(self.status_queue) == 0:
             self.status_queue.append((c.STATUS_IDLE, 30, []))
             self.status_queue.append((c.STATUS_MOVE, 30, [self.target.x, self.target.y]))
@@ -194,7 +170,6 @@ class Slime3(Enemy):
         self.max_speed = 2
 
     def ai(self):
-        dbgscreen.show(self.status)
         if len(self.status_queue) == 0:
             self.status_queue.append((c.STATUS_IDLE, 30, []))
             self.status_queue.append((c.STATUS_MOVE, 30, [self.target.x, self.target.y]))
@@ -219,7 +194,6 @@ class Orangutan(Enemy):
         self.max_speed = 1
 
     def ai(self):
-        dbgscreen.show(self.status)
         if len(self.status_queue) == 0:
             self.status_queue.append((c.STATUS_IDLE, 30, []))
             self.status_queue.append((c.STATUS_MOVE, 30, [self.target.x, self.target.y]))
@@ -244,7 +218,6 @@ class Boss(Enemy):
         self.max_speed = 5
 
     def ai(self):
-        dbgscreen.show(self.status)
         if len(self.status_queue) == 0:
             self.status_queue.append((c.STATUS_IDLE, 30, []))
             self.status_queue.append((c.STATUS_MOVE, 30, [self.target.x, self.target.y]))

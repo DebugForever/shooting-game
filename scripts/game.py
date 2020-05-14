@@ -7,6 +7,7 @@ import pygame
 from pygame.sprite import Group
 from math import sin, cos, atan2
 from . import setting, image_dict, dbgscreen
+from . import buff
 from .entity import Entity
 from .player import Player
 from .enemy import Enemy
@@ -16,6 +17,7 @@ from .tools import fix_entity_collision
 
 from .room import Room
 from .button import Button
+
 
 class Game:
     """
@@ -34,14 +36,14 @@ class Game:
     joystick: pygame.joystick.Joystick
     room: Room
     debug: bool
-    active:bool#关于游戏活动状态与否
-    play_button:Button
+    active: bool  # 关于游戏活动状态与否
+    play_button: Button
 
     def __init__(self):
         pygame.event.set_allowed(setting.event_allowed)
         self.setup()
         self.done = False
-        self.active = False#初始时游戏状态为False
+        self.active = False  # 初始时游戏状态为False
 
     def setup(self):
         self.canvas = pygame.Surface(setting.room_size)
@@ -54,14 +56,14 @@ class Game:
             self.joystick = pygame.joystick.Joystick(0)
             self.joystick.init()
 
-        self.room = BattleRoom()
+        self.room = Room()
         self.viewport = pygame.rect.Rect(0, 0, *setting.screen_resolution)
         self.viewport.center = self.room.rect.center
         self.setup_entities()
         """
         按钮的设置
         """
-        self.play_button = Button(self.screen,"Play")
+        self.play_button = Button(self.screen, "Play")
 
     def setup_entities(self):
         self.player = Player(image_dict['player'])
@@ -88,10 +90,10 @@ class Game:
         :return:
         """
         for event in pygame.event.get():
-            if not self.active :
+            if not self.active:
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    mouse_x,mouse_y = pygame.mouse.get_pos()
-                    self.handle_check_play_button(mouse_x,mouse_y)
+                    mouse_x, mouse_y = pygame.mouse.get_pos()
+                    self.handle_check_play_button(mouse_x, mouse_y)
                 elif event.type == pygame.QUIT:
                     self.done = True
                 else:
@@ -110,11 +112,11 @@ class Game:
             elif event.type == pygame.JOYAXISMOTION:
                 self.handle_joy_axis_events()
 
-    def handle_check_play_button(self,mouse_x,mouse_y):
+    def handle_check_play_button(self, mouse_x, mouse_y):
         """
         检查鼠标按键是否点击了botton
         """
-        if self.play_button.rect.collidepoint(mouse_x,mouse_y):
+        if self.play_button.rect.collidepoint(mouse_x, mouse_y):
             self.active = True
         if self.active:
             self.game_restart()
@@ -131,13 +133,13 @@ class Game:
         fire_x = self.joystick.get_axis(setting.joystick_axis_fire_x)
         fire_y = self.joystick.get_axis(setting.joystick_axis_fire_y)
         if abs(move_x) >= setting.joystick_min_motion:
-            self.player.x_vel = setting.player_speed * move_x
+            self.player.control_factor_x = move_x
         else:
-            self.player.x_vel = 0.0
+            self.player.control_factor_x = 0.0
         if abs(move_y) >= setting.joystick_min_motion:
-            self.player.y_vel = setting.player_speed * move_y
+            self.player.control_factor_y = move_y
         else:
-            self.player.y_vel = 0.0
+            self.player.control_factor_y = 0.0
 
         if abs(fire_x) >= setting.joystick_min_motion or abs(fire_y) >= setting.joystick_min_motion:
             self.player.is_fire = True
@@ -149,13 +151,13 @@ class Game:
     def handle_keydown_events(self, event: pygame.event.Event):
         keymap = setting.keymap
         if event.key in keymap[c.CONTROL_UP]:
-            self.player.y_vel -= setting.player_speed
+            self.player.control_factor_y -= 1.0
         elif event.key in keymap[c.CONTROL_DOWN]:
-            self.player.y_vel += setting.player_speed
+            self.player.control_factor_y += 1.0
         elif event.key in keymap[c.CONTROL_LEFT]:
-            self.player.x_vel -= setting.player_speed
+            self.player.control_factor_x -= 1.0
         elif event.key in keymap[c.CONTROL_RIGHT]:
-            self.player.x_vel += setting.player_speed
+            self.player.control_factor_x += 1.0
         elif event.key in keymap[c.CONTROL_FIRE]:
             self.player.is_fire = True
             self.player.fire_control = c.CONTROL_KEYBOARD
@@ -165,13 +167,13 @@ class Game:
     def handle_keyup_events(self, event: pygame.event.Event):
         keymap = setting.keymap
         if event.key in keymap[c.CONTROL_UP]:
-            self.player.y_vel += setting.player_speed
+            self.player.control_factor_y += 1.0
         elif event.key in keymap[c.CONTROL_DOWN]:
-            self.player.y_vel -= setting.player_speed
+            self.player.control_factor_y -= 1.0
         elif event.key in keymap[c.CONTROL_LEFT]:
-            self.player.x_vel += setting.player_speed
+            self.player.control_factor_x += 1.0
         elif event.key in keymap[c.CONTROL_RIGHT]:
-            self.player.x_vel -= setting.player_speed
+            self.player.control_factor_x -= 1.0
         elif event.key in keymap[c.CONTROL_FIRE]:
             self.player.is_fire = False
 
@@ -199,7 +201,6 @@ class Game:
             self.player.hp -= bullet.damage
         if self.player.hp <= 0:
             self.active = False
-            pass  # 先占个坑，以后再写
 
     def check_everything(self):
         if self.player.is_fire:
@@ -319,15 +320,13 @@ class Game:
             dbgscreen.show('(debug)bullet_count:{}'.format(len(self.bullets_p) + len(self.bullets_e)))
             dbgscreen.show(f'enemy_count:{len(self.enemies)}')
             self.handle_events()
-            self.check_everything()
-            """
-            只有当游戏启动时敌人才会移动
-            数组才会更新
-            """
             if self.active:
+                # 只有当游戏启动时敌人才会移动
+                # 数组才会更新
+                self.check_everything()
                 self.enemy_ai()
                 self.update_everything()
-            self.fix_block_entity_collision()
+                self.fix_block_entity_collision()
             self.draw_everything()
             pygame.display.flip()
             self.clock.tick(setting.fps_limit)  # 限制帧数。同时，只有用了tick，pygame内置的fps()才能使用
