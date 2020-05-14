@@ -14,7 +14,7 @@ from .enemy import Enemy
 from . import constants as c
 from .room import Room, BattleRoom
 from .tools import fix_entity_collision
-
+from .tools import load_music
 from .room import Room
 from .button import Button
 
@@ -56,7 +56,7 @@ class Game:
             self.joystick = pygame.joystick.Joystick(0)
             self.joystick.init()
 
-        self.room = Room()
+        self.room = BattleRoom()
         self.viewport = pygame.rect.Rect(0, 0, *setting.screen_resolution)
         self.viewport.center = self.room.rect.center
         self.setup_entities()
@@ -205,6 +205,7 @@ class Game:
     def check_everything(self):
         if self.player.is_fire:
             self.player.fire(self.bullets_p)
+            load_music("play_shoot.wav")
         self.check_collision_be()
         self.check_collision_bp()
         self.scroll_screen()
@@ -316,6 +317,11 @@ class Game:
         self.setup_entities()
 
     def run(self):
+        pygame.init()
+        #初始化全局音乐
+        pygame.mixer.music.load("E:\\git\\shooting-game\\resources\\cd\\bgm.ogg")
+        pygame.mixer.music.set_volume(0.3)
+        pygame.mixer.music.play(-1,0)
         while not self.done:
             dbgscreen.show('(debug)bullet_count:{}'.format(len(self.bullets_p) + len(self.bullets_e)))
             dbgscreen.show(f'enemy_count:{len(self.enemies)}')
