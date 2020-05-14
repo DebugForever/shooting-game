@@ -6,13 +6,13 @@ import pygame
 
 from pygame.sprite import Group
 from math import sin, cos, atan2
-from . import setting, image_dict, dbgscreen
+from . import setting, image_dict, dbgscreen, item
 from . import buff
 from .entity import Entity
 from .player import Player
 from .enemy import Enemy
 from . import constants as c
-from .room import Room, BattleRoom
+from .room import Room, BattleRoom, DebugRoom
 from .tools import fix_entity_collision
 
 from .room import Room
@@ -26,26 +26,28 @@ class Game:
     # 类型提示，用于编译器自动补全和消除warning
     canvas: pygame.Surface
     screen: pygame.Surface
+    screen_rect: pygame.Rect
     player: Player
     enemies: Group
     bullets_p: Group
     bullets_e: Group
     obstacles: Group
+    items: Group
     viewport: pygame.Rect
     clock: pygame.time.Clock
     joystick: pygame.joystick.Joystick
     room: Room
     debug: bool
     active: str
-    #  关于游戏活动状态，对应的状态设置在了constants
+    """关于游戏活动状态，对应的状态设置在了constants"""
     play_list: Menu
-    #  一个集成了所有菜单的类，包括play按钮，menu，list功能
+    """一个集成了所有菜单的类，包括play按钮，menu，list功能"""
 
     def __init__(self):
         pygame.event.set_allowed(setting.event_allowed)
         self.setup()
         self.done = False
-        self.active = c.ACTIVE_START # 初始时游戏状态为actice_start
+        self.active = c.ACTIVE_START  # 初始时游戏状态为actice_start
 
     def setup(self):
         self.canvas = pygame.Surface(setting.room_size)
@@ -58,7 +60,7 @@ class Game:
             self.joystick = pygame.joystick.Joystick(0)
             self.joystick.init()
 
-        self.room = BattleRoom()
+        self.room = DebugRoom()
         self.viewport = pygame.rect.Rect(0, 0, *setting.screen_resolution)
         self.viewport.center = self.room.rect.center
         self.setup_entities()
@@ -81,8 +83,11 @@ class Game:
         """敌人射出的子弹"""
         self.obstacles = Group()
         """障碍物"""
+        self.items = Group()
+        """地上的道具"""
+
         # 注册room内的这些东西，这么写感觉很抠脚，有没有改进方法呢？
-        self.room.setup(self.enemies, self.bullets_p, self.bullets_e, self.obstacles, self.player)
+        self.room.setup(self.enemies, self.bullets_p, self.bullets_e, self.obstacles, self.items, self.player)
         self.room.generate()
 
     def handle_events(self):
@@ -215,16 +220,25 @@ class Game:
         for bullet in collision:
             self.player.hp -= bullet.damage
         if self.player.hp <= 0:
-            """
-            这里不需要再添加函数了，对于处于游戏模式的每一帧都会检查一下以此判断玩家血量是否清零
-            """
-            pass # 先占个坑，以后再写
+            # 这里不需要再添加函数了，对于处于游戏模式的每一帧都会检查一下以此判断玩家血量是否清零
+            pass
+
+    def check_collision_ip(self):
+        """
+        检查地上物品与玩家的碰撞，并处理
+        ip:item and player
+        :return:
+        """
+        collision = pygame.sprite.spritecollide(self.player, self.items, True)
+        for item_ in collision:
+            item_.on_pick(self.player)
 
     def check_everything(self):
         if self.player.is_fire:
             self.player.fire(self.bullets_p)
         self.check_collision_be()
         self.check_collision_bp()
+        self.check_collision_ip()
         self.scroll_screen()
 
     def scroll_screen(self):
@@ -286,6 +300,8 @@ class Game:
             bullet.draw(self.canvas)
         for obstacle in self.obstacles:
             obstacle.draw(self.canvas)
+        for item_ in self.items:
+            item_.draw(self.canvas)
         self.player.draw(self.canvas)
         self.screen.blit(self.canvas, (0, 0), self.viewport)
         if self.debug:
@@ -329,26 +345,20 @@ class Game:
 
     def game_restart(self):
         """
-        游戏重新启动:包括步骤：清空之前所有的数组
+        游戏重新启动:包括步骤：清空之前所有的群组
         重新放入数组，room的放置只是暂时的方法，之后添加更换房间功能
         """
         self.enemies.empty()
         self.bullets_e.empty()
         self.bullets_p.empty()
+        self.obstacles.empty()
+        self.items.empty()
 
         self.player.x = self.screen_rect.centerx
         self.player.y = self.screen_rect.centery
         self.player.hp = self.player.maxhp
 
-        self.enemies = Group()
-        """所有敌人的群组"""
-        self.bullets_p = Group()
-        """玩家射出的子弹"""
-        self.bullets_e = Group()
-        """敌人射出的子弹"""
-        self.obstacles = Group()
-        """障碍物"""
-        self.room.setup(self.enemies, self.bullets_p, self.bullets_e, self.obstacles, self.player)
+        # self.room.setup(self.enemies, self.bullets_p, self.bullets_e, self.obstacles, self.player)
         self.room.generate()
 
     def check_player_hp(self):
@@ -373,7 +383,7 @@ class Game:
                 self.enemy_ai()
                 self.update_everything()
                 self.fix_block_entity_collision()
-                self.check_player_hp() # 添加的检查血量的函数
+                self.check_player_hp()  # 添加的检查血量的函数
             self.draw_everything()
             pygame.display.flip()
             self.clock.tick(setting.fps_limit)  # 限制帧数。同时，只有用了tick，pygame内置的fps()才能使用

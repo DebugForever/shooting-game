@@ -4,6 +4,7 @@
 """
 from typing import List
 
+from . import item
 from . import buff
 from .entity import Entity
 from . import setting
@@ -32,8 +33,10 @@ class Creature(Entity):
         for buff_ in self.buffs:
             buff_.update()
             buff_.on_update(self)
+            if buff_.is_faded():
+                buff_.on_fade(self)
 
-        self.buffs = list(filter(lambda b: b.is_faded(), self.buffs))  # 去除所有到期的buff
+        self.buffs: List['buff.Buff'] = list(filter(lambda b: b.is_faded(), self.buffs))  # 去除所有到期的buff
 
         self.velocity = self.speed  # 先同步速度属性，这样可以处理加减速的buff效果
         super().update()  # 其他代码不变
@@ -56,8 +59,15 @@ class Creature(Entity):
             buff_icon_left = hp_bar_rect.left
             buff_icon_rect = pygame.Rect(buff_icon_left, buff_icon_top, setting.buff_icon_width,
                                          setting.buff_icon_width)
-            for buff in self.buffs:
-                if buff.icon is None:
+            for buff_ in self.buffs:
+                if buff_.icon is None:
                     continue  # 没有图标就不画了
-                screen.blit(buff.icon, buff_icon_rect)
+                screen.blit(buff_.icon, buff_icon_rect)
                 buff_icon_rect.left += buff_icon_rect.width + setting.distance_tiny
+
+    def add_buff(self, buff_: 'buff.Buff'):
+        self.buffs.append(buff_)
+        buff_.on_inflict(self)
+
+    def pick_item(self, item_: 'item.Item'):
+        item_.on_pick(self)
