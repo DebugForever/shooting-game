@@ -26,10 +26,17 @@ class Entity(Sprite):
     @property
     def direction(self):
         """虚拟属性：面朝角度"""
-        if self._x_vel == 0 and self._y_vel == 0:  # 没有速度默认为0角度，否则atan2会报错
+        if self._x_vel == 0 and self._y_vel == 0:  # 没有速度直接返回保存的朝向，否则atan2会报错
             return self._dir
         self._dir = atan2(self._y_vel, self._x_vel)
         return self._dir
+
+    @direction.setter
+    def direction(self, new_dir):
+        self._dir = new_dir
+        v = self.velocity
+        self._x_vel = v * cos(self._dir)
+        self._y_vel = v * sin(self._dir)
 
     @property
     def x(self):
