@@ -2,6 +2,7 @@
 玩家类，玩家控制的角色
 class player
 """
+from .creature import Creature
 from .entity import Entity
 import pygame
 from pygame.sprite import Group
@@ -12,9 +13,14 @@ from . import constants as c
 from . import setting, dbgscreen
 
 
-class Player(Entity):
+class Player(Creature):
     def __init__(self, image: pygame.Surface):
         super().__init__(image)
+
+        self.maxhp = 100
+        self.hp = self.maxhp
+        self.atk = 10
+
         self.is_fire = False
         self.fire_control = ''
         """开火方式，键盘还是鼠标还是手柄"""
@@ -25,10 +31,14 @@ class Player(Entity):
         self.viewport = pygame.Rect(0, 0, 0, 0)
         """是外面的这个的引用(Game.viewport)，用于计算玩家在屏幕上的实际位置"""
 
-        # combat stats
-        self.hp = 100
-        self.maxhp = 100
-        self.atk = 10
+        self.control_factor_x = 0.0
+        """控制玩家在x分量上移动的速度比例，范围为-1~1"""
+        self.control_factor_y = 0.0
+        """控制玩家在y分量上移动的速度比例，范围为-1~1"""
+
+        self.base_speed = 4.0
+        self.speed = self.base_speed
+        self.bullet_speed = 8.0
 
     def fire(self, bullets: Group):
         """
@@ -50,22 +60,15 @@ class Player(Entity):
 
         bullet = Bullet(image_dict[c.PLAYER_BULLET_NAME])
         bullet.setup(self.x, self.y, self.atk)
-        bullet.set_dir_v(direction, setting.bullet_speed_p)
+        bullet.set_dir_v(direction, self.bullet_speed)
         bullets.add(bullet)
         self.fire_cd = setting.player_fire_cd
 
     def update(self):
-        super().update()
+        if self.control_factor_y == 0.0 and self.control_factor_x == 0.0:
+            self.speed = 0  # 没有按键按下时应停止
+        else:
+            self.speed = self.base_speed  # 有按键时就移动
+            self.direction = atan2(self.control_factor_y, self.control_factor_x)
         self.fire_cd -= 1
-
-    def draw(self, screen: pygame.Surface):
-        super().draw(screen)  # 这段代码是复制过来的，因为不想再做一层继承
-        hp_bar_rect = pygame.Rect(self.rect.bottomleft, (self.rect.width, setting.player_hpbar_height))
-        hp_rect = hp_bar_rect.copy()
-        hp_ratio = self.hp / self.maxhp
-        hp_rect.width *= hp_ratio
-        hp_rect.left = hp_bar_rect.left
-        if hp_rect.right < hp_rect.left:  # 处理负血条
-            hp_rect.width = 0
-        pygame.draw.rect(screen, setting.player_hpbar_color_high, hp_rect)  # 画血条
-        pygame.draw.rect(screen, setting.player_hpbar_line_color, hp_bar_rect, setting.player_hpbar_line_width)  # 画边框
+        super().update()
