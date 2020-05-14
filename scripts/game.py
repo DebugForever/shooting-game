@@ -16,7 +16,7 @@ from .room import Room, BattleRoom
 from .tools import fix_entity_collision
 
 from .room import Room
-from .button import Button
+from .button import Menu
 
 
 class Game:
@@ -36,14 +36,16 @@ class Game:
     joystick: pygame.joystick.Joystick
     room: Room
     debug: bool
-    active: bool  # 关于游戏活动状态与否
-    play_button: Button
+    active: str
+    #  关于游戏活动状态，对应的状态设置在了constants
+    play_list: Menu
+    #  一个集成了所有菜单的类，包括play按钮，menu，list功能
 
     def __init__(self):
         pygame.event.set_allowed(setting.event_allowed)
         self.setup()
         self.done = False
-        self.active = False  # 初始时游戏状态为False
+        self.active = c.ACTIVE_START # 初始时游戏状态为actice_start
 
     def setup(self):
         self.canvas = pygame.Surface(setting.room_size)
@@ -56,20 +58,19 @@ class Game:
             self.joystick = pygame.joystick.Joystick(0)
             self.joystick.init()
 
-        self.room = Room()
+        self.room = BattleRoom()
         self.viewport = pygame.rect.Rect(0, 0, *setting.screen_resolution)
         self.viewport.center = self.room.rect.center
         self.setup_entities()
-        """
-        按钮的设置
-        """
-        self.play_button = Button(self.screen, "Play")
+
+        self.play_list = Menu(self.screen)
+        self.active = c.ACTIVE_START
 
     def setup_entities(self):
         self.player = Player(image_dict['player'])
-        screen_rect = self.canvas.get_rect()
-        self.player.x = screen_rect.centerx
-        self.player.y = screen_rect.centery
+        self.screen_rect = self.canvas.get_rect()
+        self.player.x = self.screen_rect.centerx
+        self.player.y = self.screen_rect.centery
         self.player.viewport = self.viewport  # 感觉这样搞破坏了封装性似乎有点不妥？
 
         self.enemies = Group()
@@ -90,19 +91,13 @@ class Game:
         :return:
         """
         for event in pygame.event.get():
-            if not self.active:
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    mouse_x, mouse_y = pygame.mouse.get_pos()
-                    self.handle_check_play_button(mouse_x, mouse_y)
-                elif event.type == pygame.QUIT:
-                    self.done = True
-                else:
-                    continue
             if event.type == pygame.KEYDOWN:
                 self.handle_keydown_events(event)
             elif event.type == pygame.KEYUP:
                 self.handle_keyup_events(event)
             elif event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_x, mouse_y = pygame.mouse.get_pos()
+                self.handle_check_play_button(mouse_x, mouse_y)
                 self.player.is_fire = True
                 self.player.fire_control = c.CONTROL_MOUSE
             elif event.type == pygame.MOUSEBUTTONUP:
@@ -115,10 +110,30 @@ class Game:
     def handle_check_play_button(self, mouse_x, mouse_y):
         """
         检查鼠标按键是否点击了botton
+        状态       按钮   ->   转移状态
+        start and button ->   play
+        play  and menu   ->   list
+        list  and continue->  play
+        list  and quit   ->   quit
+        list  and restart->   play
         """
-        if self.play_button.rect.collidepoint(mouse_x, mouse_y):
-            self.active = True
-        if self.active:
+        if self.active == c.ACTIVE_START and self.play_list.button.rect.collidepoint(mouse_x, mouse_y):
+            self.active = c.ACTIVE_PLAY
+            return
+
+        if self.active == c.ACTIVE_PLAY and self.play_list.menu.rect.collidepoint(mouse_x, mouse_y):
+            self.active = c.ACTIVE_LIST
+            return
+
+        if self.active == c.ACTIVE_LIST and self.play_list.option_continue.rect.collidepoint(mouse_x, mouse_y):
+            self.active = c.ACTIVE_PLAY
+            return
+        elif self.active == c.ACTIVE_LIST and self.play_list.option_quit.rect.collidepoint(mouse_x, mouse_y):
+            self.active = c.ACTIVE_QUIT
+            self.done = True
+            return
+        elif self.active == c.ACTIVE_LIST and self.play_list.option_restart.rect.collidepoint(mouse_x, mouse_y):
+            self.active = c.ACTIVE_START
             self.game_restart()
 
     def handle_joy_axis_events(self):
@@ -200,7 +215,10 @@ class Game:
         for bullet in collision:
             self.player.hp -= bullet.damage
         if self.player.hp <= 0:
-            self.active = False
+            """
+            这里不需要再添加函数了，对于处于游戏模式的每一帧都会检查一下以此判断玩家血量是否清零
+            """
+            pass # 先占个坑，以后再写
 
     def check_everything(self):
         if self.player.is_fire:
@@ -272,9 +290,13 @@ class Game:
         self.screen.blit(self.canvas, (0, 0), self.viewport)
         if self.debug:
             dbgscreen.draw(self.screen)
-
-        if not self.active:
-            self.play_button.draw()
+        # 下列函数的功能 分不同的状态绘制不同的图像
+        if self.active == c.ACTIVE_START:
+            self.play_list.button.draw()
+        if self.active == c.ACTIVE_PLAY:
+            self.play_list.menu.draw()
+        if self.active == c.ACTIVE_LIST:
+            self.play_list.draw_list()
 
     def enemy_ai(self):
         """
@@ -308,25 +330,50 @@ class Game:
     def game_restart(self):
         """
         游戏重新启动:包括步骤：清空之前所有的数组
-        重新放入数组
+        重新放入数组，room的放置只是暂时的方法，之后添加更换房间功能
         """
         self.enemies.empty()
         self.bullets_e.empty()
         self.bullets_p.empty()
-        self.setup_entities()
+
+        self.player.x = self.screen_rect.centerx
+        self.player.y = self.screen_rect.centery
+        self.player.hp = self.player.maxhp
+
+        self.enemies = Group()
+        """所有敌人的群组"""
+        self.bullets_p = Group()
+        """玩家射出的子弹"""
+        self.bullets_e = Group()
+        """敌人射出的子弹"""
+        self.obstacles = Group()
+        """障碍物"""
+        self.room.setup(self.enemies, self.bullets_p, self.bullets_e, self.obstacles, self.player)
+        self.room.generate()
+
+    def check_player_hp(self):
+        """
+        用于检查玩家的hp是否清零，如果清零的话就处理
+        :return:
+        """
+        if self.player.hp <= 0:
+            self.active = c.ACTIVE_START
+            self.game_restart()
 
     def run(self):
         while not self.done:
             dbgscreen.show('(debug)bullet_count:{}'.format(len(self.bullets_p) + len(self.bullets_e)))
             dbgscreen.show(f'enemy_count:{len(self.enemies)}')
             self.handle_events()
-            if self.active:
+            if self.active == c.ACTIVE_PLAY:
                 # 只有当游戏启动时敌人才会移动
                 # 数组才会更新
+                # 才需要检查血量
                 self.check_everything()
                 self.enemy_ai()
                 self.update_everything()
                 self.fix_block_entity_collision()
+                self.check_player_hp() # 添加的检查血量的函数
             self.draw_everything()
             pygame.display.flip()
             self.clock.tick(setting.fps_limit)  # 限制帧数。同时，只有用了tick，pygame内置的fps()才能使用
