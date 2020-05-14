@@ -12,8 +12,8 @@ class Button():
         self.screen_rect = image.get_rect()
 
         self.width, self.height = width, height
-        self.color = (0, 255, 0);
-        self.text_color = (255, 255, 255)
+        self.color = (150, 255, 150)
+        self.text_color = (255, 240, 255)
         self.font = pygame.font.SysFont(None, 48)
         self.msg = msg
 
@@ -66,9 +66,10 @@ class List():
         self.button.set()
 
         self.start_x, self.start_y = self.option_continue.rect.bottomleft
-        self.start_y -= 2 * self.option_continue.height
+        self.start_y -= 3 * self.option_continue.height
         self.menu.rect = pygame.Rect(0, 0, self.menu.width, self.menu.height)
         self.menu.rect.centerx = self.option_continue.rect.centerx  # menu
+        self.menu.rect.centery += 5
         self.options.rect = pygame.Rect(self.start_x, self.start_y, self.options.width, self.options.height)
         self.option_continue.rect = pygame.Rect(self.start_x, self.start_y + self.options.height,
                                                 self.option_continue.width, self.option_continue.height)

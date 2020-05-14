@@ -26,7 +26,7 @@ STATUS_MOVE = 'move'  # 移动
 STATUS_FIRE = 'fire'  # 射击
 
 # 游戏进行状态相关
-ACTIVE_START = 'start' #弹出play按钮，这是整个游戏的开始界面
-ACTIVE_PLAY = 'play' #正常进行游戏，这个时候menu是需要存在的
-ACTIVE_LIST = 'list' #弹出list，这个时候游戏是需要暂停的
-ACTIVE_QUIT = 'quit' #退出游戏
+ACTIVE_START = 'start' # 弹出play按钮，这是整个游戏的开始界面
+ACTIVE_PLAY = 'play' # 正常进行游戏，这个时候menu是需要存在的
+ACTIVE_LIST = 'list' # 弹出list，这个时候游戏是需要暂停的
+ACTIVE_QUIT = 'quit' # 退出游戏

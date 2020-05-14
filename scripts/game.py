@@ -37,7 +37,7 @@ class Game:
     room: Room
     debug: bool
     active: str
-    #  关于游戏活动状态与否
+    #  关于游戏活动状态，对应的状态设置在了constants
     play_list: List
     #  一个集成了所有菜单的类，包括play按钮，menu，list功能
 
@@ -202,12 +202,8 @@ class Game:
         for enemy, bullets in collision.items():
             for bullet in bullets:
                 enemy.hp -= bullet.damage
-            if self.player.hp <= 0:
-                # self.check_player_hp()
-                """
-                这里不需要再添加函数了，对于处于游戏模式的每一帧都会检查一下以此判断玩家血量是否清零
-                """
-                pass
+            if enemy.hp <= 0:
+                enemy.kill()  # kill函数会把它从所有群组里移除（pygame提供）
 
     def check_collision_bp(self):
         """
@@ -219,10 +215,9 @@ class Game:
         for bullet in collision:
             self.player.hp -= bullet.damage
         if self.player.hp <= 0:
-            self.active = c.ACTIVE_LIST
-            self.player.hp = self.player.maxhp
-            mouse_x,mouse_y = self.play_list.option_restart.rect.center
-            self.handle_check_play_button(mouse_x,mouse_y)
+            """
+            这里不需要再添加函数了，对于处于游戏模式的每一帧都会检查一下以此判断玩家血量是否清零
+            """
             pass # 先占个坑，以后再写
 
     def check_everything(self):
@@ -362,6 +357,7 @@ class Game:
         :return:
         """
         if self.player.hp <= 0:
+            self.active = c.ACTIVE_START
             self.game_restart()
 
     def run(self):
@@ -377,7 +373,7 @@ class Game:
                 self.enemy_ai()
                 self.update_everything()
                 self.fix_block_entity_collision()
-                self.check_player_hp()
+                self.check_player_hp() # 添加的检查血量的函数
             self.draw_everything()
             pygame.display.flip()
             self.clock.tick(setting.fps_limit)  # 限制帧数。同时，只有用了tick，pygame内置的fps()才能使用
