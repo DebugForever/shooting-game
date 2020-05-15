@@ -8,12 +8,13 @@ from typing import Union, List, Tuple, Optional
 import pygame
 from pygame.sprite import Group
 
-from . import constants as c, dbgscreen
+from . import constants as c
 from . import image_dict
-from . import setting
 from .bullet import Bullet
 from .creature import Creature
+from .enemy_loot import loot_hp_regen
 from .entity import Entity
+from .loot_table import LootTable
 
 
 class Enemy(Creature):
@@ -37,6 +38,8 @@ class Enemy(Creature):
         """子弹发射时会对准的目标"""
         self.bullet_group: Optional[Group] = None
         """子弹发射需要的群组，没有则不能发射子弹，或许开火可以做成一个mixin？"""
+        self.loot_table: LootTable = LootTable()
+        """战利品表"""
 
     def set_fireable(self, target: Entity, bullet_group: Group):
         """
@@ -59,7 +62,7 @@ class Enemy(Creature):
         :param y:目标点的y坐标
         :return:None
         """
-        self.speed = self.max_speed
+        self.speed = self.basespeed
         direction = atan2(y - self.y, x - self.x)
         self.set_dir_v(direction, self.speed)
 
@@ -121,6 +124,7 @@ class Slime(Enemy):
     """
     普通怪物
     """
+
     def __init__(self):
         super().__init__(image_dict['slime'])
         self.maxhp = 100
@@ -128,7 +132,7 @@ class Slime(Enemy):
         self.atk = 10
         self.gold = 1
         self.speed = 2
-        self.max_speed = 2
+        self.basespeed = 2
 
     def ai(self):
         if len(self.status_queue) == 0:
@@ -144,6 +148,7 @@ class Slime2(Enemy):
     """
     普通怪物，血少速度快
     """
+
     def __init__(self):
         super().__init__(image_dict['slime2'])
         self.maxhp = 50
@@ -151,7 +156,7 @@ class Slime2(Enemy):
         self.atk = 10
         self.gold = 1
         self.speed = 5
-        self.max_speed = 10
+        self.basespeed = 10
 
     def ai(self):
         if len(self.status_queue) == 0:
@@ -170,6 +175,7 @@ class Slime3(Enemy):
     """
     普通怪物，加高血量
     """
+
     def __init__(self):
         super().__init__(image_dict['slime3'])
         self.maxhp = 200
@@ -177,7 +183,7 @@ class Slime3(Enemy):
         self.atk = 10
         self.gold = 1
         self.speed = 2
-        self.max_speed = 2
+        self.basespeed = 2
 
     def ai(self):
         if len(self.status_queue) == 0:
@@ -193,6 +199,7 @@ class Slime4(Enemy):
     """
     slime2的升级版本，速度飞快
     """
+
     def __init__(self):
         super().__init__(image_dict['slime2'])
         """血少速度快"""
@@ -201,7 +208,7 @@ class Slime4(Enemy):
         self.atk = 10
         self.gold = 1
         self.speed = 10
-        self.max_speed = 15
+        self.basespeed = 15
 
     def ai(self):
         if len(self.status_queue) == 0:
@@ -217,6 +224,7 @@ class Slime5(Enemy):
     """
     固定炮台型怪物，生成后就不移动，但是打一下很疼
     """
+
     def __init__(self):
         super().__init__(image_dict['slime3'])
         """血少速度快"""
@@ -225,7 +233,7 @@ class Slime5(Enemy):
         self.atk = 20
         self.gold = 2
         self.speed = 0
-        self.max_speed = 0
+        self.basespeed = 0
 
     def ai(self):
         if len(self.status_queue) == 0:
@@ -247,7 +255,7 @@ class Orangutan(Enemy):
         self.gold = 1
         """动作比较迟缓"""
         self.speed = 1
-        self.max_speed = 1
+        self.basespeed = 1
 
     def ai(self):
         if len(self.status_queue) == 0:
@@ -274,7 +282,7 @@ class Boss(Enemy):
         self.gold = 1
         """速度也很快"""
         self.speed = 5
-        self.max_speed = 5
+        self.basespeed = 5
 
     def ai(self):
         if len(self.status_queue) == 0:
@@ -288,3 +296,20 @@ class Boss(Enemy):
             self.status_queue.append((c.STATUS_FIRE, 0, [self.bullet_group]))
             self.status_queue.append((c.STATUS_FIRE, 0, [self.bullet_group]))
         self.handle_status_queue()
+
+
+class TestDummy(Enemy):
+    """测试假人，不会动，不会攻击"""
+
+    def __init__(self):
+        super().__init__(image_dict['dummy'])
+        self.maxhp = 10000
+        self.hp = 10000
+        self.atk = 0
+        self.gold = 0
+        self.speed = 0
+        self.basespeed = 0
+        self.loot_table = loot_hp_regen
+
+    def ai(self):
+        self.idle()
