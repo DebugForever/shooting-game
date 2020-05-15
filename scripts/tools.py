@@ -6,7 +6,7 @@ import math
 import os
 from math import tan
 from typing import Dict
-
+import os
 import pygame
 
 from .entity import Entity
@@ -34,21 +34,21 @@ def load_all_images(directory: str, accept_suffixs: tuple = ('.bmp', '.png'), co
             images[name] = img
     return images
 
-
-_sound_library = {}
 def load_music(name):
     """
     加载音效，后续直接将音效添加到资源文件的cd下
     通过音乐文件名调用该函数就可以了
     """
-    path = r"E:\\git\\shooting-game\\resources\\cd\\"+name
-    global _sound_library
-    sound = _sound_library.get(path)
-    if sound is None:
-        print(path)
-        sound = pygame.mixer.Sound(path)
-        sound.set_volume(0.1)
-        _sound_library[path] = sound
+    path = r"./resources/cd/"+name
+    absp = os.path.abspath(path)
+    temp = ""
+    for s in absp:
+        if s == "\\":
+            temp += r"\\"
+        else:
+            temp += s
+    sound = pygame.mixer.Sound(temp)
+    sound.set_volume(0.1)
     sound.play()
 
 def fix_entity_collision(mobile_entity: Entity, static_entity: Entity):
