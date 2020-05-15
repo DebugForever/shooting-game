@@ -6,18 +6,17 @@ from random import randint
 from typing import Optional
 
 import pygame
+from pygame.sprite import Group
 
 from . import item
 from . import setting
-from pygame.sprite import Group
-from .enemy import Slime, Enemy
+from .block import Block
+from .enemy import Boss
+from .enemy import Orangutan, Slime4, Slime5
+from .enemy import Slime, Enemy, TestDummy
 from .enemy import Slime2
 from .enemy import Slime3
-from .enemy import Orangutan, Slime4, Slime5
-from .enemy import Boss
-from .entity import Entity
 from .player import Player
-from .block import Block
 
 
 class Room:
@@ -141,6 +140,7 @@ class BattleRoom3(Room):
     生成战斗房间
     该房间全部是固定炮塔，加上两个快速移动
     """
+
     def generate(self):
         max_enemy_num = 6
         enemy_num_static = 2
@@ -149,8 +149,8 @@ class BattleRoom3(Room):
         # 生成地形（小方块）
         self.spawn_obstacle(Block(100, 80), 360, 420)
         self.spawn_obstacle(Block(200, 50), 800, 400)
-        self.spawn_obstacle(Block(100,80),50,40)
-        self.spawn_obstacle(Block(100,80),150,40)
+        self.spawn_obstacle(Block(100, 80), 50, 40)
+        self.spawn_obstacle(Block(100, 80), 150, 40)
 
         # 先在上方和下方各生成2个
         self.spawn_enemy(Slime4(), self.rect.centerx - 100, self.rect.top + 100)
@@ -209,4 +209,8 @@ class DebugRoom(Room):
     """用于测试的房间，不会在随机中出现"""
 
     def generate(self):
+        self.spawn_enemy(TestDummy(), 400, 300)
+        self.spawn_enemy(TestDummy(), 300, 400)
+        self.spawn_enemy(TestDummy(), 400, 400)
+        self.spawn_enemy(TestDummy(), 300, 300)
         self.spawn_item(item.ItemHpRegen(), 500, 500)

@@ -2,21 +2,20 @@
 游戏的主类，包含运行中的几乎所有信息
 main class of game, contains almost data
 """
-import pygame
+from math import atan2
 
+import pygame
 from pygame.sprite import Group
-from math import sin, cos, atan2
-from . import setting, image_dict, dbgscreen, item
-from . import buff
-from .entity import Entity
-from .player import Player
-from .enemy import Enemy
+
 from . import constants as c
-from .room import Room, BattleRoom, BattleRoom2, BattleRoom3, BattleRoom4, DebugRoom
-from .tools import fix_entity_collision
-from .music import Music
-from .room import Room
+from . import setting, image_dict, dbgscreen
 from .button import Menu
+from .music import Music
+from .player import Player
+from .room import DebugRoom
+from .room import Room
+from .tools import fix_entity_collision
+
 
 class Game:
     """
@@ -41,7 +40,7 @@ class Game:
     """关于游戏活动状态，对应的状态设置在了constants"""
     play_list: Menu
     """一个集成了所有菜单的类，包括play按钮，menu，list功能"""
-    game_music:Music
+    game_music: Music
 
     def __init__(self):
         pygame.event.set_allowed(setting.event_allowed)
@@ -88,7 +87,7 @@ class Game:
         """地上的道具"""
 
         # 注册room内的这些东西，这么写感觉很抠脚，有没有改进方法呢？
-        self.room = BattleRoom3()
+        self.room = DebugRoom()
         self.room.setup(self.enemies, self.bullets_p, self.bullets_e, self.obstacles, self.items, self.player)
         self.room.generate()
 
@@ -209,8 +208,6 @@ class Game:
         for enemy, bullets in collision.items():
             for bullet in bullets:
                 enemy.take_damage(bullet.damage)
-            if enemy.hp <= 0:
-                enemy.kill()  # kill函数会把它从所有群组里移除（pygame提供）
 
     def check_collision_bp(self):
         """
@@ -361,21 +358,31 @@ class Game:
         # self.room.setup(self.enemies, self.bullets_p, self.bullets_e, self.obstacles, self.player)
         self.room.generate()
         self.game_music.end_background_music()
-        self.game_music.play_background_music() #当游戏重新启动时，这个也要重新启动
+        self.game_music.play_background_music()  # 当游戏重新启动时，这个也要重新启动
 
     def check_player_hp(self):
         """
         用于检查玩家的hp是否清零，如果清零的话就处理
         :return:
         """
-        if self.player.hp > self.player.maxhp:
-            self.player.hp = self.player.maxhp
         if self.player.hp <= 0:
             self.active = c.ACTIVE_START
             self.game_restart()
 
+    def check_enemy_hp(self):
+        """
+        用于检查敌人的hp是否清零，如果清零的话就处理
+        :return:
+        """
+        for enemy in self.enemies:
+            if enemy.hp <= 0:
+                loots = enemy.loot_table.gen_loot()
+                for loot in loots:
+                    self.room.spawn_item(loot, enemy.x, enemy.y)
+                enemy.kill()
+
     def run(self):
-        self.game_music.play_background_music() # 在游戏刚开始启动时载入
+        self.game_music.play_background_music()  # 在游戏刚开始启动时载入
         while not self.done:
             dbgscreen.show('(debug)bullet_count:{}'.format(len(self.bullets_p) + len(self.bullets_e)))
             dbgscreen.show(f'enemy_count:{len(self.enemies)}')
@@ -389,6 +396,7 @@ class Game:
                 self.update_everything()
                 self.fix_block_entity_collision()
                 self.check_player_hp()  # 添加的检查血量的函数
+                self.check_enemy_hp()
             self.draw_everything()
             pygame.display.flip()
             self.clock.tick(setting.fps_limit)  # 限制帧数。同时，只有用了tick，pygame内置的fps()才能使用
