@@ -205,7 +205,10 @@ class Game:
     def check_everything(self):
         if self.player.is_fire:
             self.player.fire(self.bullets_p)
-            load_music("play_shoot.wav")
+            s = load_music("play_shoot.wav")
+            sound = pygame.mixer.Sound(s)
+            sound.set_volume(0.1)
+            sound.play()
         self.check_collision_be()
         self.check_collision_bp()
         self.scroll_screen()
@@ -319,7 +322,8 @@ class Game:
     def run(self):
         pygame.init()
         #初始化全局音乐
-        pygame.mixer.music.load("E:\\git\\shooting-game\\resources\\cd\\bgm.ogg")
+        s = load_music("bgm.ogg")
+        pygame.mixer.music.load(s)
         pygame.mixer.music.set_volume(0.3)
         pygame.mixer.music.play(-1,0)
         while not self.done:

@@ -6,14 +6,13 @@ import math
 import os
 from math import tan
 from typing import Dict
-import os
 import pygame
 
 from .entity import Entity
 
 
 def load_all_images(directory: str, accept_suffixs: tuple = ('.bmp', '.png'), color_key: tuple = (255, 0, 255)) \
-        -> Dict[str, pygame.Surface]:
+    -> Dict[str, pygame.Surface]:
     """
     :param directory:要读取的路径
     :param accept_suffixs要读取的格式
@@ -36,20 +35,12 @@ def load_all_images(directory: str, accept_suffixs: tuple = ('.bmp', '.png'), co
 
 def load_music(name):
     """
-    加载音效，后续直接将音效添加到资源文件的cd下
-    通过音乐文件名调用该函数就可以了
+    由于背景音乐用load加载，音效用sound加载，所以编写一个返回音乐路径的函数
+    后续背景音乐和音效根据具体情况而定
+    就三行代码不需要重构（假装很理直气壮
     """
-    path = r"./resources/cd/"+name
-    absp = os.path.abspath(path)
-    temp = ""
-    for s in absp:
-        if s == "\\":
-            temp += r"\\"
-        else:
-            temp += s
-    sound = pygame.mixer.Sound(temp)
-    sound.set_volume(0.1)
-    sound.play()
+    path = os.path.join('resources', 'cd',name)
+    return path
 
 def fix_entity_collision(mobile_entity: Entity, static_entity: Entity):
     """
