@@ -12,7 +12,7 @@ from .entity import Entity
 from .player import Player
 from .enemy import Enemy
 from . import constants as c
-from .room import Room, BattleRoom, DebugRoom
+from .room import Room, BattleRoom, BattleRoom2, BattleRoom3, BattleRoom4, DebugRoom
 from .tools import fix_entity_collision
 from .music import Music
 from .room import Room
@@ -88,7 +88,7 @@ class Game:
         """地上的道具"""
 
         # 注册room内的这些东西，这么写感觉很抠脚，有没有改进方法呢？
-        self.room = BattleRoom()
+        self.room = BattleRoom3()
         self.room.setup(self.enemies, self.bullets_p, self.bullets_e, self.obstacles, self.items, self.player)
         self.room.generate()
 

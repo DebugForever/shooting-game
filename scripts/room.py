@@ -13,7 +13,7 @@ from pygame.sprite import Group
 from .enemy import Slime, Enemy
 from .enemy import Slime2
 from .enemy import Slime3
-from .enemy import Orangutan
+from .enemy import Orangutan, Slime4, Slime5
 from .enemy import Boss
 from .entity import Entity
 from .player import Player
@@ -69,7 +69,10 @@ class Room:
 
 
 class BattleRoom(Room):
-    """战斗房间，会生成一些敌人"""
+    """
+    战斗房间，会生成一些敌人
+    普通关卡，只会生成一般般的敌人
+    """
 
     def generate(self):
         max_enemy_num = 8
@@ -77,11 +80,14 @@ class BattleRoom(Room):
         """固有敌人的生成数量"""
 
         # 生成地形（小方块）
-        self.spawn_obstacle(Block(200, 80), 360, 420)
+        self.spawn_obstacle(Block(100, 200), 460, 220)
+        self.spawn_obstacle(Block(100, 50), 460, 720)
+        self.spawn_obstacle(Block(50, 100), 310, 420)
+        self.spawn_obstacle(Block(50, 100), 510, 420)
 
         # 先在上方和下方各生成2个
         self.spawn_enemy(Slime(), self.rect.centerx - 100, self.rect.top + 100)
-        self.spawn_enemy(Slime2(), self.rect.centerx + 100, self.rect.top + 100)
+        self.spawn_enemy(Slime4(), self.rect.centerx + 100, self.rect.top + 100)
         self.spawn_enemy(Slime3(), self.rect.centerx - 100, self.rect.bottom - 100)
         self.spawn_enemy(Orangutan(), self.rect.centerx + 100, self.rect.bottom - 100)
 
@@ -90,6 +96,108 @@ class BattleRoom(Room):
             x = randint(self.rect.left, self.rect.right)
             y = randint(self.rect.top, self.rect.bottom)
             now_enemy = Slime()
+            now_enemy.x = x
+            now_enemy.y = y
+            if not pygame.sprite.spritecollideany(now_enemy, self.enemies) \
+                    and not pygame.sprite.spritecollideany(now_enemy, self.obstacles):
+                self.spawn_enemy(now_enemy)
+
+
+class BattleRoom2(Room):
+    """
+    战斗房间，会生成一些敌人
+    特殊地形关卡
+    """
+
+    def generate(self):
+        max_enemy_num = 8
+        enemy_num_static = 4
+        """固有敌人的生成数量"""
+
+        # 生成地形（小方块）
+        self.spawn_obstacle(Block(2, 400), 460, 420)
+        self.spawn_obstacle(Block(400, 2), 460, 420)
+
+        # 先在上方和下方各生成4个
+        self.spawn_enemy(Slime4(), self.rect.centerx - 300, self.rect.top + 100)
+        self.spawn_enemy(Slime4(), self.rect.centerx + 100, self.rect.top + 100)
+        self.spawn_enemy(Slime3(), self.rect.centerx - 100, self.rect.bottom - 100)
+        self.spawn_enemy(Orangutan(), self.rect.centerx + 100, self.rect.bottom - 100)
+
+        # 之后随机生成4个，如果有重叠则放弃生成
+        for i in range(max_enemy_num - enemy_num_static):
+            x = randint(self.rect.left, self.rect.right)
+            y = randint(self.rect.top, self.rect.bottom)
+            now_enemy = Slime()
+            now_enemy.x = x
+            now_enemy.y = y
+            if not pygame.sprite.spritecollideany(now_enemy, self.enemies) \
+                    and not pygame.sprite.spritecollideany(now_enemy, self.obstacles):
+                self.spawn_enemy(now_enemy)
+
+
+class BattleRoom3(Room):
+    """
+    生成战斗房间
+    该房间全部是固定炮塔，加上两个快速移动
+    """
+    def generate(self):
+        max_enemy_num = 6
+        enemy_num_static = 2
+        """固有敌人的生成数量"""
+
+        # 生成地形（小方块）
+        self.spawn_obstacle(Block(100, 80), 360, 420)
+        self.spawn_obstacle(Block(200, 50), 800, 400)
+        self.spawn_obstacle(Block(100,80),50,40)
+        self.spawn_obstacle(Block(100,80),150,40)
+
+        # 先在上方和下方各生成2个
+        self.spawn_enemy(Slime4(), self.rect.centerx - 100, self.rect.top + 100)
+        self.spawn_enemy(Slime2(), self.rect.centerx + 100, self.rect.top + 100)
+        self.spawn_enemy(Slime2(), self.rect.centerx - 100, self.rect.bottom - 100)
+        self.spawn_enemy(Slime4(), self.rect.centerx + 100, self.rect.bottom - 100)
+
+        # 之后随机生成4个，如果有重叠则放弃生成
+        for i in range(max_enemy_num - enemy_num_static):
+            x = randint(self.rect.left, self.rect.right)
+            y = randint(self.rect.top, self.rect.bottom)
+            now_enemy = Slime5()
+            now_enemy.x = x
+            now_enemy.y = y
+            if not pygame.sprite.spritecollideany(now_enemy, self.enemies) \
+                    and not pygame.sprite.spritecollideany(now_enemy, self.obstacles):
+                self.spawn_enemy(now_enemy)
+
+
+class BattleRoom4(Room):
+    """战斗房间，会生成一些敌人
+    boss型房间
+    """
+
+    def generate(self):
+        max_enemy_num = 10
+        enemy_num_static = 5
+        """固有敌人的生成数量"""
+
+        # 生成地形（小方块）
+        self.spawn_obstacle(Block(100, 80), 360, 420)
+        self.spawn_obstacle(Block(200, 100), 800, 400)
+        self.spawn_obstacle(Block(200, 100), 600, 200)
+        self.spawn_obstacle(Block(200, 100), 100, 600)
+
+        # 先在上方和下方各生成5个
+        self.spawn_enemy(Slime4(), self.rect.centerx - 100, self.rect.top + 100)
+        self.spawn_enemy(Slime4(), self.rect.centerx + 100, self.rect.top + 100)
+        self.spawn_enemy(Slime4(), self.rect.centerx - 100, self.rect.bottom - 100)
+        self.spawn_enemy(Boss(), self.rect.centerx + 100, self.rect.bottom - 100)
+        self.spawn_enemy(Slime4(), self.rect.centerx - 100, self.rect.bottom - 100)
+
+        # 之后随机生成4个，如果有重叠则放弃生成
+        for i in range(max_enemy_num - enemy_num_static):
+            x = randint(self.rect.left, self.rect.right)
+            y = randint(self.rect.top, self.rect.bottom)
+            now_enemy = Slime5()
             now_enemy.x = x
             now_enemy.y = y
             if not pygame.sprite.spritecollideany(now_enemy, self.enemies) \
