@@ -208,7 +208,7 @@ class Game:
         collision = pygame.sprite.groupcollide(self.enemies, self.bullets_p, False, True)
         for enemy, bullets in collision.items():
             for bullet in bullets:
-                enemy.hp -= bullet.damage
+                enemy.take_damage(bullet.damage)
             if enemy.hp <= 0:
                 enemy.kill()  # kill函数会把它从所有群组里移除（pygame提供）
 
@@ -220,10 +220,7 @@ class Game:
         """
         collision = pygame.sprite.spritecollide(self.player, self.bullets_e, True)
         for bullet in collision:
-            self.player.hp -= bullet.damage
-        if self.player.hp <= 0:
-            # 这里不需要再添加函数了，对于处于游戏模式的每一帧都会检查一下以此判断玩家血量是否清零
-            pass
+            self.player.take_damage(bullet.damage)
 
     def check_collision_ip(self):
         """
@@ -344,7 +341,7 @@ class Game:
 
         collision = pygame.sprite.spritecollide(self.player, self.obstacles, False)
         if collision:
-            fix_entity_collision(self.player, collision[0])
+            fix_entity_collision(self.player, collision[0])  # 同时有多个碰撞无法处理，所以只处理一个
 
     def game_restart(self):
         """

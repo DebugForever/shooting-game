@@ -53,7 +53,7 @@ class Creature(Entity):
         pygame.draw.rect(screen, setting.hpbar_color, hp_rect)  # 画血条
         pygame.draw.rect(screen, setting.hpbar_line_color, hp_bar_rect, setting.hpbar_line_width)  # 画边框
 
-        # 画buff图标
+        # 画buff图标 buff个数过多怎么办？暂时可以不用管，但是还是要考虑
         if self.buffs:
             buff_icon_top = hp_bar_rect.bottom + setting.distance_tiny
             buff_icon_left = hp_bar_rect.left
@@ -71,3 +71,13 @@ class Creature(Entity):
 
     def pick_item(self, item_: 'item.Item'):
         item_.on_pick(self)
+
+    def take_damage(self, damage: float):
+        self.hp -= damage
+        if self.hp < 0:
+            self.hp = 0
+
+    def heal(self, heal_hp: float):
+        self.hp += heal_hp
+        if self.hp > self.maxhp:
+            self.hp = self.maxhp
