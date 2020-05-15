@@ -14,10 +14,9 @@ from .enemy import Enemy
 from . import constants as c
 from .room import Room, BattleRoom, DebugRoom
 from .tools import fix_entity_collision
-
+from .music import Music
 from .room import Room
 from .button import Menu
-
 
 class Game:
     """
@@ -42,6 +41,7 @@ class Game:
     """关于游戏活动状态，对应的状态设置在了constants"""
     play_list: Menu
     """一个集成了所有菜单的类，包括play按钮，menu，list功能"""
+    game_music:Music
 
     def __init__(self):
         pygame.event.set_allowed(setting.event_allowed)
@@ -67,6 +67,7 @@ class Game:
 
         self.play_list = Menu(self.screen)
         self.active = c.ACTIVE_START
+        self.game_music = Music()
 
     def setup_entities(self):
         self.player = Player(image_dict['player'])
@@ -87,6 +88,7 @@ class Game:
         """地上的道具"""
 
         # 注册room内的这些东西，这么写感觉很抠脚，有没有改进方法呢？
+        self.room = BattleRoom()
         self.room.setup(self.enemies, self.bullets_p, self.bullets_e, self.obstacles, self.items, self.player)
         self.room.generate()
 
@@ -236,6 +238,7 @@ class Game:
     def check_everything(self):
         if self.player.is_fire:
             self.player.fire(self.bullets_p)
+            self.game_music.play_player_shoot()
         self.check_collision_be()
         self.check_collision_bp()
         self.check_collision_ip()
@@ -360,17 +363,22 @@ class Game:
 
         # self.room.setup(self.enemies, self.bullets_p, self.bullets_e, self.obstacles, self.player)
         self.room.generate()
+        self.game_music.end_background_music()
+        self.game_music.play_background_music() #当游戏重新启动时，这个也要重新启动
 
     def check_player_hp(self):
         """
         用于检查玩家的hp是否清零，如果清零的话就处理
         :return:
         """
+        if self.player.hp > self.player.maxhp:
+            self.player.hp = self.player.maxhp
         if self.player.hp <= 0:
             self.active = c.ACTIVE_START
             self.game_restart()
 
     def run(self):
+        self.game_music.play_background_music() # 在游戏刚开始启动时载入
         while not self.done:
             dbgscreen.show('(debug)bullet_count:{}'.format(len(self.bullets_p) + len(self.bullets_e)))
             dbgscreen.show(f'enemy_count:{len(self.enemies)}')
