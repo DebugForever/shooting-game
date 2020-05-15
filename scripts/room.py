@@ -6,6 +6,8 @@ from random import randint
 from typing import Optional
 
 import pygame
+
+from . import item
 from . import setting
 from pygame.sprite import Group
 from .enemy import Slime, Enemy
@@ -31,12 +33,13 @@ class Room:
         self.rect = pygame.rect.Rect(0, 0, *setting.room_size)
         self.done = False
 
-    def setup(self, enemies: Group, bullets_p: Group, bullets_e: Group, obstacles: Group, player: Player):
+    def setup(self, enemies: Group, bullets_p: Group, bullets_e: Group, obstacles: Group, items: Group, player: Player):
         self.enemies = enemies
         self.bullets_e = bullets_e
         self.bullets_p = bullets_p
         self.player = player
         self.obstacles = obstacles
+        self.items = items
 
     def spawn_enemy(self, enemy: Enemy, x: Optional[int] = None, y: Optional[int] = None):
         if x is not None:
@@ -51,6 +54,11 @@ class Room:
         obstacle.x = x
         obstacle.y = y
         self.obstacles.add(obstacle)
+
+    def spawn_item(self, item_: 'item.Item', x: int, y: int):
+        item_.x = x
+        item_.y = y
+        self.items.add(item_)
 
     def generate(self):
         """
@@ -87,3 +95,10 @@ class BattleRoom(Room):
             if not pygame.sprite.spritecollideany(now_enemy, self.enemies) \
                     and not pygame.sprite.spritecollideany(now_enemy, self.obstacles):
                 self.spawn_enemy(now_enemy)
+
+
+class DebugRoom(Room):
+    """用于测试的房间，不会在随机中出现"""
+
+    def generate(self):
+        self.spawn_item(item.ItemHpRegen(), 500, 500)

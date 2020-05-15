@@ -45,11 +45,23 @@ class BuffBurn(Buff):
     def __init__(self):
         super().__init__()
         self.id = 1
-        self.duration = 30 * setting.fps_limit
+        self.duration = 5 * setting.fps_limit
         self.tick_left = self.duration
         self.name = 'burn'
         self.icon = image_dict['buff1']
 
     def on_update(self, target: 'creature.Creature'):
         target.hp -= 0.1
-        dbgscreen.print(target.hp)
+
+
+class BuffRegen(Buff):
+    def __init__(self):
+        super().__init__()
+        self.id = 2
+        self.duration = 10 * setting.fps_limit
+        self.tick_left = self.duration
+        self.name = 'regen'
+        self.icon = image_dict['buff2']
+
+    def on_update(self, target: 'creature.Creature'):
+        target.hp += 0.1
