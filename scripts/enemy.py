@@ -118,6 +118,9 @@ class Enemy(Creature):
 
 # todo 给下面的怪物改一个适合的名字
 class Slime(Enemy):
+    """
+    普通怪物
+    """
     def __init__(self):
         super().__init__(image_dict['slime'])
         self.maxhp = 100
@@ -138,30 +141,37 @@ class Slime(Enemy):
 
 
 class Slime2(Enemy):
+    """
+    普通怪物，血少速度快
+    """
     def __init__(self):
         super().__init__(image_dict['slime2'])
-        """血少速度快"""
         self.maxhp = 50
         self.hp = 50
         self.atk = 10
         self.gold = 1
-        self.speed = 1
-        self.max_speed = 1
+        self.speed = 5
+        self.max_speed = 10
 
     def ai(self):
         if len(self.status_queue) == 0:
-            self.status_queue.append((c.STATUS_IDLE, 30, []))
+            self.status_queue.append((c.STATUS_IDLE, 10, []))
             self.status_queue.append((c.STATUS_MOVE, 30, [self.target.x, self.target.y]))
             self.status_queue.append((c.STATUS_FIRE, 0, [self.bullet_group]))
             self.status_queue.append((c.STATUS_IDLE, 10, []))
+            self.status_queue.append((c.STATUS_FIRE, 0, [self.bullet_group]))
+            self.status_queue.append((c.STATUS_IDLE, 10, []))
+            self.status_queue.append((c.STATUS_MOVE, 30, [self.target.x, self.target.y]))
             self.status_queue.append((c.STATUS_FIRE, 0, [self.bullet_group]))
         self.handle_status_queue()
 
 
 class Slime3(Enemy):
+    """
+    普通怪物，加高血量
+    """
     def __init__(self):
         super().__init__(image_dict['slime3'])
-        """第一个高配版"""
         self.maxhp = 200
         self.hp = 200
         self.atk = 10
@@ -173,6 +183,52 @@ class Slime3(Enemy):
         if len(self.status_queue) == 0:
             self.status_queue.append((c.STATUS_IDLE, 30, []))
             self.status_queue.append((c.STATUS_MOVE, 30, [self.target.x, self.target.y]))
+            self.status_queue.append((c.STATUS_FIRE, 0, [self.bullet_group]))
+            self.status_queue.append((c.STATUS_IDLE, 10, []))
+            self.status_queue.append((c.STATUS_FIRE, 0, [self.bullet_group]))
+        self.handle_status_queue()
+
+
+class Slime4(Enemy):
+    """
+    slime2的升级版本，速度飞快
+    """
+    def __init__(self):
+        super().__init__(image_dict['slime2'])
+        """血少速度快"""
+        self.maxhp = 50
+        self.hp = 50
+        self.atk = 10
+        self.gold = 1
+        self.speed = 10
+        self.max_speed = 15
+
+    def ai(self):
+        if len(self.status_queue) == 0:
+            self.status_queue.append((c.STATUS_IDLE, 10, []))
+            self.status_queue.append((c.STATUS_MOVE, 10, [self.target.x, self.target.y]))
+            self.status_queue.append((c.STATUS_FIRE, 0, [self.bullet_group]))
+            self.status_queue.append((c.STATUS_IDLE, 10, []))
+            self.status_queue.append((c.STATUS_FIRE, 0, [self.bullet_group]))
+        self.handle_status_queue()
+
+
+class Slime5(Enemy):
+    """
+    固定炮台型怪物，生成后就不移动，但是打一下很疼
+    """
+    def __init__(self):
+        super().__init__(image_dict['slime3'])
+        """血少速度快"""
+        self.maxhp = 300
+        self.hp = 300
+        self.atk = 20
+        self.gold = 2
+        self.speed = 0
+        self.max_speed = 0
+
+    def ai(self):
+        if len(self.status_queue) == 0:
             self.status_queue.append((c.STATUS_FIRE, 0, [self.bullet_group]))
             self.status_queue.append((c.STATUS_IDLE, 10, []))
             self.status_queue.append((c.STATUS_FIRE, 0, [self.bullet_group]))
@@ -195,20 +251,23 @@ class Orangutan(Enemy):
 
     def ai(self):
         if len(self.status_queue) == 0:
-            self.status_queue.append((c.STATUS_IDLE, 30, []))
+            self.status_queue.append((c.STATUS_IDLE, 10, []))
             self.status_queue.append((c.STATUS_MOVE, 30, [self.target.x, self.target.y]))
             self.status_queue.append((c.STATUS_FIRE, 0, [self.bullet_group]))
             self.status_queue.append((c.STATUS_IDLE, 10, []))
+            self.status_queue.append((c.STATUS_FIRE, 0, [self.bullet_group]))
+            self.status_queue.append((c.STATUS_MOVE, 30, [self.target.x, self.target.y]))
             self.status_queue.append((c.STATUS_FIRE, 0, [self.bullet_group]))
         self.handle_status_queue()
 
 
 class Boss(Enemy):
-    """因为是boss所以长得比较大只"""
+    """因为是boss所以长得比较大只
+    终极boss
+    """
 
     def __init__(self):
         super().__init__(image_dict['boss'])
-        """设定为终极boss"""
         self.maxhp = 500
         self.hp = 500
         self.atk = 10
@@ -219,9 +278,13 @@ class Boss(Enemy):
 
     def ai(self):
         if len(self.status_queue) == 0:
-            self.status_queue.append((c.STATUS_IDLE, 30, []))
+            self.status_queue.append((c.STATUS_IDLE, 10, []))
             self.status_queue.append((c.STATUS_MOVE, 30, [self.target.x, self.target.y]))
             self.status_queue.append((c.STATUS_FIRE, 0, [self.bullet_group]))
-            self.status_queue.append((c.STATUS_IDLE, 10, []))
+            self.status_queue.append((c.STATUS_IDLE, 20, []))
+            self.status_queue.append((c.STATUS_FIRE, 0, [self.bullet_group]))
+            self.status_queue.append((c.STATUS_FIRE, 0, [self.bullet_group]))
+            self.status_queue.append((c.STATUS_IDLE, 20, []))
+            self.status_queue.append((c.STATUS_FIRE, 0, [self.bullet_group]))
             self.status_queue.append((c.STATUS_FIRE, 0, [self.bullet_group]))
         self.handle_status_queue()
