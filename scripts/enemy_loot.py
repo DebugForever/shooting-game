@@ -19,3 +19,9 @@ loot_example = LootTable(
 loot_hp_regen = LootTable(
     ((item.ItemHpRegen, 1.0), (None, 1.0)),
 )
+
+loot_reward = LootTable(
+    ((item.ItemHpRegen, 1.0), (item.ItemSword, 1.0), (item.ItemShield, 1.0), (item.ItemShield, 1.0),
+     (item.ItemSlowDown, 1.0))
+)
+"""给宝箱制作的掉落物"""
