@@ -21,9 +21,9 @@ class Creature(Entity):
         self.hp = 1
         self.atk = 1
         self.gold = 1
-        self.basespeed = 1.0
+        self.base_speed = 1.0
         """基础移速"""
-        self.speed = self.basespeed
+        self.speed = self.base_speed
         """当前移速"""
         self.bullet_speed = 1
 

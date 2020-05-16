@@ -43,7 +43,7 @@ class ItemSlowDown(Item):
         super().__init__(image_dict['item3'])
 
     def on_pick(self, target: 'creature.Creature'):
-        target.add_buff(buff.BuffSlow_down())
+        target.add_buff(buff.BuffSlowDown())
 
 
 class ItemShield(Item):
