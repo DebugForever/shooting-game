@@ -15,7 +15,7 @@ from .button import Menu
 from .item import ItemExit
 from .music import Music
 from .player import Player
-from .room import DebugRoom
+from .room import DefaultRoom
 from .room import Room
 from .room_gen import get_random_room
 from .tools import fix_entity_collision
@@ -65,7 +65,7 @@ class Game:
             self.joystick = pygame.joystick.Joystick(0)
             self.joystick.init()
 
-        self.room = DebugRoom()
+        self.room = Room()
         self.viewport = pygame.rect.Rect(0, 0, *setting.screen_resolution)
         self.viewport.center = self.room.rect.center
         self.setup_entities()
@@ -93,7 +93,7 @@ class Game:
         """地上的道具"""
 
         # 注册room内的这些东西，这么写感觉很抠脚，有没有改进方法呢？
-        self.room = DebugRoom()
+        self.room = DefaultRoom()
         self.room.setup(self.enemies, self.bullets_p, self.bullets_e, self.obstacles, self.items, self.player)
         self.room.generate()
 
@@ -377,19 +377,18 @@ class Game:
         self.player.y = self.screen_rect.centery
         self.player.hp = self.player.maxhp
         self.player.hp = 100
-        self.player.maxhp = 100 # 这里是一个妥协，因为添加了可以更改maxhp的buff
+        self.player.maxhp = 100  # 这里是一个妥协，因为添加了可以更改maxhp的buff
         self.player.hp = self.player.maxhp
         self.player.atk = 10
         self.player.base_speed = 4.0
         self.player.speed = self.player.base_speed
         self.player.bullet_speed = 8.0
-        self.player.buffs.clear() # buff清零，这是死亡时的状态，所以包括道具在内一切道具清零
+        self.player.buffs.clear()  # buff清零，这是死亡时的状态，所以包括道具在内一切道具清零
 
         # self.room.setup(self.enemies, self.bullets_p, self.bullets_e, self.obstacles, self.player)
         self.room.generate()
         self.game_music.end_background_music()
         self.game_music.play_background_music()  # 当游戏重新启动时，背景音乐什么的也要重新启动
-
 
     def check_player_hp(self):
         """
@@ -417,6 +416,7 @@ class Game:
         while not self.done:
             dbgscreen.show('(debug)bullet_count:{}'.format(len(self.bullets_p) + len(self.bullets_e)))
             dbgscreen.show(f'enemy_count:{len(self.enemies)}')
+            dbgscreen.show(f'player_hp:{self.player.hp}/{self.player.maxhp}')
             self.handle_events()
             if self.active == c.ACTIVE_PLAY:
                 # 只有当游戏启动时敌人才会移动

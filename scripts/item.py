@@ -40,10 +40,10 @@ class ItemHpRegen(Item):
 
 class ItemSlowDown(Item):
     def __init__(self):
-        super().__init__(image_dict['item3'])
+        super().__init__(image_dict['slow'])
 
     def on_pick(self, target: 'creature.Creature'):
-        target.add_buff(buff.BuffSlow_down())
+        target.add_buff(buff.BuffSlowDown())
 
 
 class ItemShield(Item):
@@ -68,3 +68,11 @@ class ItemSword(Item):
 
     def on_pick(self, target: 'creature.Creature'):
         target.add_buff(buff.BuffSword())
+
+
+class ItemHpPotion(Item):
+    def __init__(self):
+        super().__init__(image_dict['hp_potion'])
+
+    def on_pick(self, target: 'creature.Creature'):
+        target.add_buff(buff.BuffHeal())

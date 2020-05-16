@@ -11,7 +11,7 @@ from pygame.sprite import Group
 from . import item
 from . import setting
 from .block import Block
-from .enemy import Boss, Orangutan, Slime4, Slime, Enemy, TestDummy, Slime2, Slime3,Slime5
+from .enemy import Boss, Orangutan, Slime4, Slime, Enemy, TestDummy, Slime2, Slime3, TreasureBox
 from .entity import Entity
 from .player import Player
 
@@ -223,6 +223,14 @@ class BattleRoom4(Room):
         self.spawn_enemy(Slime4(), self.rect.centerx - 100, self.rect.bottom - 100)
 
 
+class TreasureRoom(Room):
+    """放宝藏的福利房间，内含两个宝箱"""
+
+    def generate(self):
+        self.spawn_enemy(TreasureBox(), 400, 400)
+        self.spawn_enemy(TreasureBox(), 600, 400)
+
+
 class DebugRoom(Room):
     """用于测试的房间，不会在随机中出现"""
 
@@ -230,8 +238,14 @@ class DebugRoom(Room):
         self.spawn_enemy(TestDummy(), 400, 300)
         self.spawn_enemy(TestDummy(), 300, 400)
         self.spawn_enemy(TestDummy(), 400, 400)
-        self.spawn_enemy(TestDummy(), 300, 300)
+        self.spawn_enemy(TreasureBox(), 300, 300)
         self.spawn_enemy_randompos(Orangutan(), no_overlap=True)
         self.spawn_item(item.ItemSlowDown(), 500, 500)
-        self.spawn_item(item.ItemHpRegen(),600,600)
+        self.spawn_item(item.ItemHpRegen(), 600, 600)
+        self.spawn_item(item.ItemHpPotion(), 500, 600)
+        self.spawn_item(item.ItemSword(), 600, 500)
+        self.spawn_item(item.ItemBow(), 700, 700)
+        self.spawn_item(item.ItemShield(), 700, 600)
 
+
+DefaultRoom = BattleRoom
