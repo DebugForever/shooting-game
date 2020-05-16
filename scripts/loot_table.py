@@ -6,7 +6,11 @@ from typing import Union, Tuple, List, Any
 
 
 class Loot:
-    """战利品类，保存一组*互斥的*物品以及其掉落权重"""
+    """
+    战利品类，保存一组*互斥的*物品以及其掉落权重
+    使用gen_loot来随机获得战利品中的一项
+    这些物品可以是None，表示没有掉落
+    """
 
     def __init__(self, *loot_list: Tuple[Union[Any, None], float]):
         self.loot_class_list: List[Union[Any, None]] = []
@@ -26,7 +30,7 @@ class Loot:
 
     def gen_loot(self):
         """
-        根据掉落表生成一组掉落
+        根据掉落表生成一个掉落
         :return:生成的掉落物，不掉落返回None
         """
         wsum = sum(self.weight_list)
@@ -45,7 +49,19 @@ class Loot:
 
 
 class LootTable:
+    """
+    战利品表类，用于保存一个生物的掉落物品以及其概率。
+    支持独立和互斥两种掉落方式，并且可以混合
+    """
+
     def __init__(self, *loot_list_list: Tuple[Tuple[Union[Any, None], float], ...]):
+        """
+        LootTable(
+            ((掉落物1的类名,权重),...), # 每一个元组（一行）表示一组互斥的掉落，类名使用None表示不掉落
+            ...
+        )
+        :param loot_list_list:一些元组，每一个元组构造一个Loot类
+        """
         self.loots: List[Loot] = []
         for loot_list in loot_list_list:
             self.add_loot(*loot_list)
