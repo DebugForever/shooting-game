@@ -51,7 +51,7 @@ class BuffBurn(Buff):
         self.icon = image_dict['buff1']
 
     def on_update(self, target: 'creature.Creature'):
-        target.hp -= 0.1
+        target.take_damage(0.1)
 
 
 class BuffRegen(Buff):
@@ -64,4 +64,4 @@ class BuffRegen(Buff):
         self.icon = image_dict['buff2']
 
     def on_update(self, target: 'creature.Creature'):
-        target.hp += 0.1
+        target.heal(0.1)

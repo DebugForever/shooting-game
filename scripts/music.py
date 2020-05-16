@@ -1,12 +1,14 @@
-import pygame
 import os
 from typing import Dict
+
+import pygame
+
 
 class Music():
     """
     关于音乐的类
     """
-    all_music: dict() # 全部音乐的字典,但是不知道里面填什么(sound不是类名)，就暂时这样放着
+    all_music: Dict  # 全部音乐的字典,但是不知道里面填什么(sound不是类名)，就暂时这样放着
     background_music: pygame.mixer.Sound
     player_shoot: pygame.mixer.Sound
     player_hit: pygame.mixer.Sound
