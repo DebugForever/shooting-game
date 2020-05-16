@@ -303,8 +303,8 @@ class TestDummy(Enemy):
 
     def __init__(self):
         super().__init__(image_dict['dummy'])
-        self.maxhp = 10000
-        self.hp = 10000
+        self.maxhp = 10
+        self.hp = 10
         self.atk = 0
         self.gold = 0
         self.speed = 0

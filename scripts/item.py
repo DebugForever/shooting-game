@@ -4,8 +4,8 @@
 """
 import pygame
 
-from .entity import Entity
 from . import creature, image_dict, buff
+from .entity import Entity
 
 
 class Item(Entity):
@@ -19,6 +19,15 @@ class Item(Entity):
         比如下一关的出口等。
         """
         pass
+
+
+class ItemExit(Item):
+    """房间出口，用于切换关卡"""
+
+    def __init__(self, next_room_class=None):
+        """指定下一个房间，不指定则随机"""
+        super().__init__(image_dict['roomexit'])
+        self.next_room_class = next_room_class
 
 
 class ItemHpRegen(Item):

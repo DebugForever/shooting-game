@@ -5,7 +5,8 @@ buffs and debuffs
 from typing import Optional
 
 import pygame
-from . import creature, dbgscreen, setting, image_dict
+
+from . import creature, setting, image_dict
 
 
 class Buff:
