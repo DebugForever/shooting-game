@@ -36,3 +36,35 @@ class ItemHpRegen(Item):
 
     def on_pick(self, target: 'creature.Creature'):
         target.add_buff(buff.BuffRegen())
+
+
+class ItemSlowDown(Item):
+    def __init__(self):
+        super().__init__(image_dict['item3'])
+
+    def on_pick(self, target: 'creature.Creature'):
+        target.add_buff(buff.BuffSlow_down())
+
+
+class ItemShield(Item):
+    def __init__(self):
+        super().__init__(image_dict['shield'])
+
+    def on_pick(self, target: 'creature.Creature'):
+        target.add_buff(buff.BuffShield())
+
+
+class ItemBow(Item):
+    def __init__(self):
+        super().__init__(image_dict['bow'])
+
+    def on_pick(self, target: 'creature.Creature'):
+        target.add_buff(buff.BuffBow())
+
+
+class ItemSword(Item):
+    def __init__(self):
+        super().__init__(image_dict['sword'])
+
+    def on_pick(self, target: 'creature.Creature'):
+        target.add_buff(buff.BuffSword())

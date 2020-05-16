@@ -376,11 +376,20 @@ class Game:
         self.player.x = self.screen_rect.centerx
         self.player.y = self.screen_rect.centery
         self.player.hp = self.player.maxhp
+        self.player.hp = 100
+        self.player.maxhp = 100 # 这里是一个妥协，因为添加了可以更改maxhp的buff
+        self.player.hp = self.player.maxhp
+        self.player.atk = 10
+        self.player.base_speed = 4.0
+        self.player.speed = self.player.base_speed
+        self.player.bullet_speed = 8.0
+        self.player.buffs.clear() # buff清零，这是死亡时的状态，所以包括道具在内一切道具清零
 
         # self.room.setup(self.enemies, self.bullets_p, self.bullets_e, self.obstacles, self.player)
         self.room.generate()
         self.game_music.end_background_music()
-        self.game_music.play_background_music()  # 当游戏重新启动时，这个也要重新启动
+        self.game_music.play_background_music()  # 当游戏重新启动时，背景音乐什么的也要重新启动
+
 
     def check_player_hp(self):
         """

@@ -11,7 +11,7 @@ from pygame.sprite import Group
 from . import item
 from . import setting
 from .block import Block
-from .enemy import Boss, Orangutan, Slime4, Slime, Enemy, TestDummy, Slime2, Slime3
+from .enemy import Boss, Orangutan, Slime4, Slime, Enemy, TestDummy, Slime2, Slime3,Slime5
 from .entity import Entity
 from .player import Player
 
@@ -228,5 +228,10 @@ class DebugRoom(Room):
 
     def generate(self):
         self.spawn_enemy(TestDummy(), 400, 300)
-        self.spawn_item(item.ItemExit(), 400, 400)
-        self.spawn_item(item.ItemHpRegen(), 500, 500)
+        self.spawn_enemy(TestDummy(), 300, 400)
+        self.spawn_enemy(TestDummy(), 400, 400)
+        self.spawn_enemy(TestDummy(), 300, 300)
+        self.spawn_enemy_randompos(Orangutan(), no_overlap=True)
+        self.spawn_item(item.ItemSlowDown(), 500, 500)
+        self.spawn_item(item.ItemHpRegen(),600,600)
+
