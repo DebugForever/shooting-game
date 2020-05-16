@@ -12,7 +12,7 @@ from . import constants as c
 from . import image_dict
 from .bullet import Bullet
 from .creature import Creature
-from .enemy_loot import loot_hp_regen
+from .enemy_loot import loot_hp_regen, loot_treasure_box, loot_enemy_elite, loot_enemy_normal
 from .entity import Entity
 from .loot_table import LootTable
 
@@ -62,7 +62,7 @@ class Enemy(Creature):
         :param y:目标点的y坐标
         :return:None
         """
-        self.speed = self.basespeed
+        self.speed = self.base_speed
         direction = atan2(y - self.y, x - self.x)
         self.set_dir_v(direction, self.speed)
 
@@ -132,7 +132,8 @@ class Slime(Enemy):
         self.atk = 10
         self.gold = 1
         self.speed = 2
-        self.basespeed = 2
+        self.base_speed = 2
+        self.loot_table = loot_enemy_normal
 
     def ai(self):
         if len(self.status_queue) == 0:
@@ -156,7 +157,8 @@ class Slime2(Enemy):
         self.atk = 10
         self.gold = 1
         self.speed = 5
-        self.basespeed = 10
+        self.base_speed = 10
+        self.loot_table = loot_enemy_normal
 
     def ai(self):
         if len(self.status_queue) == 0:
@@ -183,7 +185,8 @@ class Slime3(Enemy):
         self.atk = 10
         self.gold = 1
         self.speed = 2
-        self.basespeed = 2
+        self.base_speed = 2
+        self.loot_table = loot_enemy_normal
 
     def ai(self):
         if len(self.status_queue) == 0:
@@ -208,7 +211,8 @@ class Slime4(Enemy):
         self.atk = 10
         self.gold = 1
         self.speed = 10
-        self.basespeed = 15
+        self.base_speed = 15
+        self.loot_table = loot_enemy_normal
 
     def ai(self):
         if len(self.status_queue) == 0:
@@ -233,7 +237,8 @@ class Slime5(Enemy):
         self.atk = 20
         self.gold = 2
         self.speed = 0
-        self.basespeed = 0
+        self.base_speed = 0
+        self.loot_table = loot_enemy_normal
 
     def ai(self):
         if len(self.status_queue) == 0:
@@ -255,7 +260,8 @@ class Orangutan(Enemy):
         self.gold = 1
         """动作比较迟缓"""
         self.speed = 1
-        self.basespeed = 1
+        self.base_speed = 1
+        self.loot_table = loot_enemy_elite
 
     def ai(self):
         if len(self.status_queue) == 0:
@@ -282,7 +288,8 @@ class Boss(Enemy):
         self.gold = 1
         """速度也很快"""
         self.speed = 5
-        self.basespeed = 5
+        self.base_speed = 5
+        self.loot_table = loot_enemy_elite
 
     def ai(self):
         if len(self.status_queue) == 0:
@@ -298,6 +305,21 @@ class Boss(Enemy):
         self.handle_status_queue()
 
 
+class TreasureBox(Enemy):
+    def __init__(self):
+        super().__init__(image_dict['treasure_box'])
+        self.maxhp = 30
+        self.hp = 30
+        self.atk = 0
+        self.gold = 0
+        self.speed = 0
+        self.basespeed = 0
+        self.loot_table = loot_treasure_box
+
+    def ai(self):
+        self.idle()
+
+
 class TestDummy(Enemy):
     """测试假人，不会动，不会攻击"""
 
@@ -308,7 +330,7 @@ class TestDummy(Enemy):
         self.atk = 0
         self.gold = 0
         self.speed = 0
-        self.basespeed = 0
+        self.base_speed = 0
         self.loot_table = loot_hp_regen
 
     def ai(self):

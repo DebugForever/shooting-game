@@ -162,3 +162,18 @@ class BuffSword(Buff):
     def on_fade(self, target: 'creature.Creature'):
         """buff自然消失（时间结束）时调用的函数"""
         target.atk -= 10
+
+
+class BuffHeal(Buff):
+    """血瓶，立即治疗一定血量"""
+
+    def __init__(self):
+        super().__init__()
+        self.id = 7
+        self.duration = 1
+        self.tick_left = self.duration
+        self.name = 'heal'
+        self.icon = None  # 即时治疗不需要图标
+
+    def on_inflict(self, target: 'creature.Creature'):
+        target.heal(50)

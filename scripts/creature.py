@@ -75,8 +75,6 @@ class Creature(Entity):
 
     def take_damage(self, damage: float):
         self.hp -= damage
-        if self.hp < 0:
-            self.hp = 0
 
     def heal(self, heal_hp: float):
         self.hp += heal_hp
