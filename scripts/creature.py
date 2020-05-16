@@ -37,7 +37,7 @@ class Creature(Entity):
             if buff_.is_faded():
                 buff_.on_fade(self)
 
-        self.buffs: List['buff.Buff'] = list(filter(lambda b: b.is_faded(), self.buffs))  # 去除所有到期的buff
+        self.buffs: List['buff.Buff'] = list(filter(lambda b: not b.is_faded(), self.buffs))  # 去除所有到期的buff
 
         self.velocity = self.speed  # 先同步速度属性，这样可以处理加减速的buff效果
         super().update()  # 其他代码不变

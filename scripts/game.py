@@ -3,17 +3,21 @@
 main class of game, contains almost data
 """
 from math import atan2
+from typing import Optional
 
 import pygame
 from pygame.sprite import Group
 
 from . import constants as c
+from . import item
 from . import setting, image_dict, dbgscreen
 from .button import Menu
+from .item import ItemExit
 from .music import Music
 from .player import Player
 from .room import DebugRoom
 from .room import Room
+from .room_gen import get_random_room
 from .tools import fix_entity_collision
 
 
@@ -41,6 +45,7 @@ class Game:
     play_list: Menu
     """一个集成了所有菜单的类，包括play按钮，menu，list功能"""
     game_music: Music
+    room_passed: int
 
     def __init__(self):
         pygame.event.set_allowed(setting.event_allowed)
@@ -54,6 +59,7 @@ class Game:
         pygame.display.set_caption(setting.caption)
         self.debug = setting.debug_default
         self.clock = pygame.time.Clock()
+        self.room_passed = 0
 
         if pygame.joystick.get_count() > 0:
             self.joystick = pygame.joystick.Joystick(0)
@@ -223,11 +229,30 @@ class Game:
         """
         检查地上物品与玩家的碰撞，并处理
         ip:item and player
-        :return:
         """
+        switch_room = False
+        next_room: Optional[Room] = None
         collision = pygame.sprite.spritecollide(self.player, self.items, True)
         for item_ in collision:
             item_.on_pick(self.player)
+            if isinstance(item_, item.ItemExit):  # 碰到了下一关道具
+                if item_.next_room_class is not None:
+                    next_room = item_.next_room_class()
+                else:
+                    next_room = get_random_room()
+        # 处理完所有道具的拾取再切换
+        if next_room is not None:
+            next_room.inherit(self.room)
+            self.room = next_room
+            self.room.clear()
+            self.room.generate()
+            self.room_passed += 1
+
+    def check_room_finish(self):
+        if len(self.room.enemies) == 0 and not self.room.done:  # 打完了生成一个下一关道具
+            self.room.done = True  # 防止多次生成
+            self.room.spawn_item(ItemExit(), self.player.x + setting.distance_big, self.player.y)
+            self.room.spawn_item(ItemExit(), self.player.x - setting.distance_big, self.player.y)
 
     def check_everything(self):
         if self.player.is_fire:
@@ -236,6 +261,7 @@ class Game:
         self.check_collision_be()
         self.check_collision_bp()
         self.check_collision_ip()
+        self.check_room_finish()
         self.scroll_screen()
 
     def scroll_screen(self):
@@ -345,11 +371,7 @@ class Game:
         游戏重新启动:包括步骤：清空之前所有的群组
         重新放入数组，room的放置只是暂时的方法，之后添加更换房间功能
         """
-        self.enemies.empty()
-        self.bullets_e.empty()
-        self.bullets_p.empty()
-        self.obstacles.empty()
-        self.items.empty()
+        self.room.clear()
 
         self.player.x = self.screen_rect.centerx
         self.player.y = self.screen_rect.centery

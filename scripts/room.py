@@ -1,6 +1,6 @@
 """
-生成随机的房间
-generate random rooms
+房间类，控制怪物的生成
+class room which can genarate enemies
 """
 import random
 from typing import Optional
@@ -37,6 +37,24 @@ class Room:
         self.player = player
         self.obstacles = obstacles
         self.items = items
+
+    def inherit(self, rhs: 'Room'):
+        """从别的房间继承基本的变量"""
+        self.enemies = rhs.enemies
+        self.bullets_e = rhs.bullets_e
+        self.bullets_p = rhs.bullets_p
+        self.player = rhs.player
+        self.obstacles = rhs.obstacles
+        self.items = rhs.items
+        self.rect = rhs.rect
+
+    def clear(self):
+        """清空所有房间里玩家以外的实体"""
+        self.enemies.empty()
+        self.bullets_e.empty()
+        self.bullets_p.empty()
+        self.obstacles.empty()
+        self.items.empty()
 
     def spawn_enemy(self, enemy: Enemy, x: Optional[int] = None, y: Optional[int] = None):
         """
@@ -210,8 +228,5 @@ class DebugRoom(Room):
 
     def generate(self):
         self.spawn_enemy(TestDummy(), 400, 300)
-        self.spawn_enemy(TestDummy(), 300, 400)
-        self.spawn_enemy(TestDummy(), 400, 400)
-        self.spawn_enemy(TestDummy(), 300, 300)
-        self.spawn_enemy_randompos(Orangutan(), no_overlap=True)
+        self.spawn_item(item.ItemExit(), 400, 400)
         self.spawn_item(item.ItemHpRegen(), 500, 500)

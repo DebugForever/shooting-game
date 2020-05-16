@@ -5,7 +5,8 @@ buffs and debuffs
 from typing import Optional
 
 import pygame
-from . import creature, dbgscreen, setting, image_dict
+
+from . import creature, setting, image_dict
 
 
 class Buff:
@@ -23,7 +24,7 @@ class Buff:
         """没有icon（图标）的buff不会显示"""
 
     def is_faded(self):
-        return self.tick_left > 0
+        return self.tick_left <= 0
 
     def update(self):
         self.tick_left -= 1
