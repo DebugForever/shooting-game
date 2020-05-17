@@ -11,7 +11,7 @@ from pygame.sprite import Group
 from . import item
 from . import setting
 from .block import Block
-from .enemy import Boss, Orangutan, Slime4, Slime, Enemy, TestDummy, Slime2, Slime3, TreasureBox
+from .enemy import Boss, Orangutan, Slime4, Slime, Enemy, TestDummy, Slime2, Slime3, TreasureBox,Slime5
 from .entity import Entity
 from .player import Player
 
@@ -151,6 +151,10 @@ class BattleRoom(Room):
         self.spawn_enemy(Slime4(), self.rect.centerx + 100, self.rect.top + 100)
         self.spawn_enemy(Slime3(), self.rect.centerx - 100, self.rect.bottom - 100)
         self.spawn_enemy(Orangutan(), self.rect.centerx + 100, self.rect.bottom - 100)
+        for i in range(1,2):
+            self.spawn_enemy_randompos(Slime4(), no_overlap=True)
+        for i in range(1,2):
+            self.spawn_enemy_randompos(Slime(),no_overlap=True)
 
 
 class BattleRoom2(Room):
@@ -165,14 +169,18 @@ class BattleRoom2(Room):
         """固有敌人的生成数量"""
 
         # 生成地形（小方块）
-        self.spawn_obstacle(Block(2, 400), 460, 420)
-        self.spawn_obstacle(Block(400, 2), 460, 420)
+        self.spawn_obstacle(Block(4, 400), 460, 420)
+        self.spawn_obstacle(Block(400, 4), 460, 420)
 
         # 先在上方和下方各生成4个
-        self.spawn_enemy(Slime4(), self.rect.centerx - 300, self.rect.top + 100)
-        self.spawn_enemy(Slime4(), self.rect.centerx + 100, self.rect.top + 100)
+        self.spawn_enemy(Slime2(), self.rect.centerx - 300, self.rect.top + 100)
+        self.spawn_enemy(Slime(), self.rect.centerx + 100, self.rect.top + 100)
         self.spawn_enemy(Slime3(), self.rect.centerx - 100, self.rect.bottom - 100)
         self.spawn_enemy(Orangutan(), self.rect.centerx + 100, self.rect.bottom - 100)
+        for i in range(1 , 2):
+            self.spawn_enemy_randompos(Slime4(), no_overlap=True)
+        for i in range(1 , 3):
+            self.spawn_enemy_randompos(Slime5(),no_overlap= True)
 
 
 class BattleRoom3(Room):
@@ -195,8 +203,10 @@ class BattleRoom3(Room):
         # 先在上方和下方各生成2个
         self.spawn_enemy(Slime4(), self.rect.centerx - 100, self.rect.top + 100)
         self.spawn_enemy(Slime2(), self.rect.centerx + 100, self.rect.top + 100)
-        self.spawn_enemy(Slime2(), self.rect.centerx - 100, self.rect.bottom - 100)
+        self.spawn_enemy(Slime(), self.rect.centerx - 100, self.rect.bottom - 100)
         self.spawn_enemy(Slime4(), self.rect.centerx + 100, self.rect.bottom - 100)
+        for i in range(1,3):
+            self.spawn_enemy_randompos(Slime5(), no_overlap=True)
 
 
 class BattleRoom4(Room):
@@ -218,17 +228,22 @@ class BattleRoom4(Room):
         # 先在上方和下方各生成5个
         self.spawn_enemy(Slime4(), self.rect.centerx - 100, self.rect.top + 100)
         self.spawn_enemy(Slime4(), self.rect.centerx + 100, self.rect.top + 100)
-        self.spawn_enemy(Slime4(), self.rect.centerx - 100, self.rect.bottom - 100)
+        self.spawn_enemy(Slime3(), self.rect.centerx - 100, self.rect.bottom - 100)
         self.spawn_enemy(Boss(), self.rect.centerx + 100, self.rect.bottom - 100)
-        self.spawn_enemy(Slime4(), self.rect.centerx - 100, self.rect.bottom - 100)
+        self.spawn_enemy(Orangutan(), self.rect.centerx - 100, self.rect.bottom - 100)
+        
+        for i in range(1,4):
+            self.spawn_enemy_randompos(Slime5(), no_overlap=True)
+        for i in range(1,3):
+            self.spawn_enemy_randompos(Slime4(),no_overlap=True)
 
 
 class TreasureRoom(Room):
     """放宝藏的福利房间，内含两个宝箱"""
 
     def generate(self):
-        self.spawn_enemy(TreasureBox(), 400, 400)
-        self.spawn_enemy(TreasureBox(), 600, 400)
+        self.spawn_enemy_randompos(TreasureBox(), no_overlap=True)
+        self.spawn_enemy_randompos(TreasureBox(),no_overlap=True)
 
 
 class DebugRoom(Room):

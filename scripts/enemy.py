@@ -208,7 +208,7 @@ class Slime4(Enemy):
         """血少速度快"""
         self.maxhp = 50
         self.hp = 50
-        self.atk = 10
+        self.atk = 5
         self.gold = 1
         self.speed = 10
         self.base_speed = 15
@@ -231,10 +231,9 @@ class Slime5(Enemy):
 
     def __init__(self):
         super().__init__(image_dict['slime3'])
-        """血少速度快"""
         self.maxhp = 300
         self.hp = 300
-        self.atk = 20
+        self.atk = 2
         self.gold = 2
         self.speed = 0
         self.base_speed = 0
@@ -243,8 +242,8 @@ class Slime5(Enemy):
     def ai(self):
         if len(self.status_queue) == 0:
             self.status_queue.append((c.STATUS_FIRE, 0, [self.bullet_group]))
-            self.status_queue.append((c.STATUS_IDLE, 10, []))
-            self.status_queue.append((c.STATUS_FIRE, 0, [self.bullet_group]))
+            self.status_queue.append((c.STATUS_IDLE, 15, []))
+
         self.handle_status_queue()
 
 
