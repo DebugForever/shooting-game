@@ -143,7 +143,7 @@ class BattleRoom(Room):
         # 生成地形（小方块）
         self.spawn_obstacle(Block(100, 200), 460, 220)
         self.spawn_obstacle(Block(100, 50), 460, 720)
-        self.spawn_obstacle(Block(50, 100), 310, 420)
+        self.spawn_obstacle(Block(50, 100), 210, 420)
         self.spawn_obstacle(Block(50, 100), 510, 420)
 
         # 先在上方和下方各生成2个
@@ -231,7 +231,7 @@ class BattleRoom4(Room):
         self.spawn_enemy(Slime3(), self.rect.centerx - 100, self.rect.bottom - 100)
         self.spawn_enemy(Boss(), self.rect.centerx + 100, self.rect.bottom - 100)
         self.spawn_enemy(Orangutan(), self.rect.centerx - 100, self.rect.bottom - 100)
-        
+
         for i in range(1,4):
             self.spawn_enemy_randompos(Slime5(), no_overlap=True)
         for i in range(1,3):
