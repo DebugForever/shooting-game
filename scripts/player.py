@@ -38,7 +38,7 @@ class Player(Creature):
 
         self.base_speed = 4.0
         self.speed = self.base_speed
-        self.bullet_speed = 8.0
+        self.bullet_speed = 8
 
     def fire(self, bullets: Group):
         """

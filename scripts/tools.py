@@ -20,12 +20,12 @@ def load_all_images(directory: str, accept_suffixs: tuple = ('.bmp', '.png'), co
     :param color_key:设定为透明色的颜色，如果图片本身有alpha通道，则使用alpha通道
     :return:包含所有图片的字典
     """
-    images = dict()
-    for pic in os.listdir(directory):
-        name, suffix = os.path.splitext(pic)
-        if suffix.lower() in accept_suffixs:
-            pic_path = os.path.join(directory, pic)
-            img = pygame.image.load(pic_path)
+    images = dict() # 创立映射
+    for pic in os.listdir(directory): # 打开在这个路径下的所以文件
+        name, suffix = os.path.splitext(pic) # 读取这个文件的名字 后缀
+        if suffix.lower() in accept_suffixs: # 如果后缀是.bmp 或者 .png的话
+            pic_path = os.path.join(directory, pic) # 打开这个文件
+            img = pygame.image.load(pic_path) # 加载这个文件
             if img.get_alpha():
                 img = img.convert_alpha()  # 转换为最快的格式，下同
             else:
@@ -63,6 +63,6 @@ def fix_entity_collision(mobile_entity: Entity, static_entity: Entity):
             dx = 0
         else:
             dx = dy / tan(-mobile_entity.direction)
-
+            
     mobile_entity.rect.move_ip(dx, dy)
     mobile_entity.sync_xy_rect()
